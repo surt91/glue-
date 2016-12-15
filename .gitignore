@@ -1,2 +1,5 @@
-*.o
+glue++
+
+obj/
+dep/
 
