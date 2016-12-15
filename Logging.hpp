@@ -52,15 +52,15 @@ enum log_level_t {
 
 /// Labels appearing in front of messenges of the associated verbosity levels
 static const std::vector<std::string> LABEL = {
-    "",
-    "",
-    "Error:   ",
-    "Warning: ",
-    "Info:    ",
-    "Timing:  ",
-    "Debug:   ",
-    "Debug2:  ",
-    "Debug3:  "
+    "# ",
+    "# ",
+    "# Error:   ",
+    "# Warning: ",
+    "# Info:    ",
+    "# Timing:  ",
+    "# Debug:   ",
+    "# Debug2:  ",
+    "# Debug3:  "
 };
 
 /// Labels appearing in front of messenges of the associated verbosity levels with color
