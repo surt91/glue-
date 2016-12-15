@@ -1,0 +1,6 @@
+[submodule "gzstream"]
+	path = gzstream
+	url = git@gist.github.com:1508048.git
+[submodule "tclap"]
+	path = tclap
+	url = git@github.com:mirror/tclap.git
