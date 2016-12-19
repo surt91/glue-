@@ -17,11 +17,12 @@ class Cmd
         Cmd() {};
         Cmd(int argc, char** argv);
 
-        std::string output; ///< output filename
-        std::vector<std::string> data_path_vector;  ///< vector of output names, one for every temperature (only for parallel tempering);
+        std::string output;                           ///< output filename
+        std::vector<std::string> data_path_vector;    ///< vector of input files
         std::vector<std::string> border_path_vector;  ///< vector of of input files used to determine the borders
 
-        std::string text;           ///< the full command used to start this program
+        std::string text;                             ///< the full command used to start this program
+        std::vector<double> thetas;                           ///< temperatures of the files in the same order
 
         double lowerBound, upperBound;
         int num_bins;

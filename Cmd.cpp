@@ -36,6 +36,7 @@ Cmd::Cmd(int argc, char** argv)
         TCLAP::ValueArg<double> upperArg("u", "upper", "upper bound", false, -1, "double", cmd);
         TCLAP::ValueArg<double> lowerArg("l", "lower", "lower bound", false, -1, "double", cmd);
         TCLAP::ValueArg<int> numBinsArg("B", "bins", "number of bins", false, 100, "int", cmd);
+        TCLAP::MultiArg<double> thetaArg("T", "theta", "temperatures corresponding to the input files", false, "double", cmd);
 
         // switch argument
         // -short, --long, description, default
@@ -71,12 +72,31 @@ Cmd::Cmd(int argc, char** argv)
         LOG(LOG_INFO) << "num bins                   " << num_bins;
 
         data_path_vector = dataPathArg.getValue();
+        thetas = thetaArg.getValue();
         if(data_path_vector.size() == 0)
         {
             LOG(LOG_ERROR) << "You need at least one input file";
             exit(2);
         }
-        LOG(LOG_INFO) << "Paths to read the data from {" << data_path_vector << "}";
+        if(data_path_vector.size() > 1 && data_path_vector.size() != thetas.size())
+        {
+            LOG(LOG_ERROR) << "You need at a temperature (theta) value for each input file";
+            exit(3);
+        }
+        LOG(LOG_INFO) << "Paths to read the data from: {";
+        for(size_t j=0; j<data_path_vector.size(); ++j)
+        {
+            if(data_path_vector.size() > 1)
+            {
+                LOG(LOG_INFO) << "  " << thetas[j] << ": " << data_path_vector[j] << ",";
+            }
+            else
+            {
+                LOG(LOG_INFO) << data_path_vector[j];
+            }
+        }
+        LOG(LOG_INFO) << "}";
+
         border_path_vector = borderPathArg.getValue();
         LOG(LOG_INFO) << "Paths to get the borders from {" << border_path_vector << "}";
 
