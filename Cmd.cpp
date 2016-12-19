@@ -20,6 +20,7 @@ Cmd::Cmd(int argc, char** argv)
         // value argument
         // -short, --long, description, required, default, type
         TCLAP::MultiArg<std::string> dataPathArg("i", "input", "name of a data file", false, "string", cmd);
+        TCLAP::MultiArg<std::string> borderPathArg("b", "borderfiles", "files to determine the border from", false, "string", cmd);
         TCLAP::ValueArg<std::string> outputArg("o", "output", "name of the file for the resulting histogram", false, "", "string", cmd);
         TCLAP::ValueArg<std::string> logfileArg("L", "logfile", "log to file", false, "", "string", cmd);
         TCLAP::ValueArg<int> verboseArg("v", "verbose", "verbosity level:\n"
@@ -76,6 +77,8 @@ Cmd::Cmd(int argc, char** argv)
             exit(2);
         }
         LOG(LOG_INFO) << "Paths to read the data from {" << data_path_vector << "}";
+        border_path_vector = borderPathArg.getValue();
+        LOG(LOG_INFO) << "Paths to get the borders from {" << border_path_vector << "}";
 
         output = outputArg.getValue();
         LOG(LOG_INFO) << "target path                " << output;

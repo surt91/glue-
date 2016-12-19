@@ -1,28 +1,22 @@
 #include "fileOp.hpp"
 
-Histogram histogramFromFile(std::string filename, int num_bins, double lower, double upper, int column)
+std::string getNthWord(const std::string &line, int n)
 {
-    Histogram h(num_bins, lower, upper);
-    igzstream is(filename.c_str());
-    while(is.good())
+    std::string word;
+    std::stringstream ss;
+    ss.str(line);
+    int ctr = 0;
+    do
     {
-        std::string line;
-        std::getline(is, line);
-        if(line.empty() || line[0] == '#')
-            continue;
+        std::getline(ss, word, ' ');
+        ++ctr;
+    } while(ctr <= n);
+    return word;
+}
 
-        std::string word;
-        std::stringstream ss;
-        ss.str(line);
-        int ctr = 0;
-        do
-        {
-            std::getline(ss, word, ' ');
-            ++ctr;
-        } while(ctr <= column);
-
-        double number = std::stod(word);
-        h.add(number);
-    }
-    return h;
+// http://stackoverflow.com/a/20446239/1698412
+bool has_suffix(const std::string &str, const std::string &suffix)
+{
+    return str.size() >= suffix.size() &&
+           str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
