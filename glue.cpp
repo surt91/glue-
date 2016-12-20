@@ -46,7 +46,7 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         const auto centers2 = hists[i].centers();
 
         std::vector<double> Z;
-        //~ std::vector<double> weight; // how to weight the data, to get the mean of Z
+        std::vector<double> weight; // how to weight the data, to get the mean of Z
         // get region of overlap
         // assumes temperatures are ordered
         for(size_t j=0; j<data1.size(); ++j)
@@ -54,12 +54,13 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
             if(count1[j] > threshold && count2[j] > threshold)
             {
                 Z.push_back(data1[j]-data2[j]);
-                //~ weight.push_back(std::min(hists[i].get_data()[j], hists[i].get_data()[j]));
+                // weight the Z: more weight, if both datasets have many entries
+                weight.push_back(std::min(hists[i].get_data()[j], hists[i].get_data()[j]));
             }
         }
         double meanZ;
         if(Z.size())
-            meanZ = mean(Z);
+            meanZ = weighted_mean(Z, weight);
         else
             meanZ = 0;
 
