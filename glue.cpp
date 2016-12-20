@@ -8,6 +8,15 @@ double correct_bias(double s, double theta, double p_s)
 
 Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> thetas, int threshold)
 {
+    std::string histname = "hist.dat";
+    std::string correctedname = "corrected.dat";
+    std::string gluedname = "glued.dat";
+    std::ofstream osHist(histname);
+    std::ofstream osCorrected(correctedname);
+    std::ofstream osGlued(gluedname);
+    for(auto h : hists)
+        osHist << h.ascii_table();
+
     std::vector<std::vector<double>> corrected_data;
     for(size_t i=0; i<hists.size(); ++i)
     {
@@ -24,6 +33,7 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         for(size_t j=0; j<data.size(); ++j)
             osCorrected << centers[j] << " " << corrected[j] << "\n";
     }
+
 
     std::vector<double> Zs(hists.size(), 0);
     for(size_t i=1; i<hists.size(); ++i)
@@ -58,9 +68,10 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
     // correct data
     for(size_t i=1; i<hists.size(); ++i)
         for(size_t j=0; j<corrected_data[i].size(); ++j)
+        {
             corrected_data[i][j] += Zs[i];
-
-    // TODO: save raw data in file
+            osGlued << hists[i].centers()[j] << " " << corrected_data[i][j] << "\n";
+        }
 
     Histogram out(hists[0].borders());
 
@@ -79,6 +90,8 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
                 total_weight += weight;
             }
         }
+        LOG(LOG_DEBUG) << "total " << total;
+        LOG(LOG_DEBUG) << "total weight " << total_weight;
         out.at(j) = total/total_weight;
     }
 
