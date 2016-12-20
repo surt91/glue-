@@ -24,6 +24,8 @@ class Cmd
         std::string text;                             ///< the full command used to start this program
         std::vector<double> thetas;                           ///< temperatures of the files in the same order
 
+        int column;
+
         double lowerBound, upperBound;
         int num_bins;
 };

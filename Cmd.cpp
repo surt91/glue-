@@ -37,6 +37,7 @@ Cmd::Cmd(int argc, char** argv)
         TCLAP::ValueArg<double> lowerArg("l", "lower", "lower bound", false, -1, "double", cmd);
         TCLAP::ValueArg<int> numBinsArg("B", "bins", "number of bins", false, 100, "int", cmd);
         TCLAP::MultiArg<double> thetaArg("T", "theta", "temperatures corresponding to the input files", false, "double", cmd);
+        TCLAP::ValueArg<int> columnArg("c", "column", "in which column is the data", false, 0, "int", cmd);
 
         // switch argument
         // -short, --long, description, default
@@ -70,6 +71,9 @@ Cmd::Cmd(int argc, char** argv)
         num_bins = numBinsArg.getValue();
         LOG(LOG_INFO) << "range               [" << lowerBound << ":" << upperBound << "]";
         LOG(LOG_INFO) << "num bins                   " << num_bins;
+
+        column = columnArg.getValue();
+        LOG(LOG_INFO) << "column                     " << column;
 
         data_path_vector = dataPathArg.getValue();
         thetas = thetaArg.getValue();

@@ -36,13 +36,13 @@ int main(int argc, char** argv)
             if(has_suffix(file, ".gz"))
             {
                 igzstream is(file.c_str());
-                bordersFromStream(is, o.lowerBound, o.upperBound);
+                bordersFromStream(is, o.lowerBound, o.upperBound, o.column);
             }
             // otherwise try to read it as a normal file
             else
             {
                 std::ifstream is(file.c_str());
-                bordersFromStream(is, o.lowerBound, o.upperBound);
+                bordersFromStream(is, o.lowerBound, o.upperBound, o.column);
             }
         }
         LOG(LOG_INFO) << "use range [" << o.lowerBound << ", " << o.upperBound<< "]";
@@ -56,13 +56,13 @@ int main(int argc, char** argv)
         if(has_suffix(file, ".gz"))
         {
             igzstream is(file.c_str());
-            histograms.emplace_back(histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound));
+            histograms.emplace_back(histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column));
         }
         // otherwise try to read it as a normal file
         else
         {
             std::ifstream is(file.c_str());
-            histograms.emplace_back(histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound));
+            histograms.emplace_back(histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column));
         }
     }
 
