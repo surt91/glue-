@@ -2,7 +2,8 @@
 
 double correct_bias(double s, double theta, double p_s)
 {
-    return std::exp(s/theta) * p_s;
+    // std::exp(s/theta) * p_s;, but calculate only logarithms
+    return s/theta + std::log(p_s);
 }
 
 Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> thetas, int threshold)
@@ -19,11 +20,16 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
             corrected.push_back(correct_bias(centers[j], theta, data[j]));
 
         corrected_data.push_back(corrected);
+
+        for(size_t j=0; j<data.size(); ++j)
+            osCorrected << centers[j] << " " << corrected[j] << "\n";
     }
 
     std::vector<double> Zs(hists.size(), 0);
     for(size_t i=1; i<hists.size(); ++i)
     {
+        const auto count1 = hists[i-1].get_data();
+        const auto count2 = hists[i].get_data();
         const auto data1 = corrected_data[i-1];
         const auto data2 = corrected_data[i];
         const auto centers1 = hists[i-1].centers();
@@ -35,13 +41,19 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         // assumes temperatures are ordered
         for(size_t j=0; j<data1.size(); ++j)
         {
-            if(data1[j] > threshold && data2[j] > threshold)
+            if(count1[j] > threshold && count2[j] > threshold)
             {
                 Z.push_back(data1[j]-data2[j]);
                 //~ weight.push_back(std::min(hists[i].get_data()[j], hists[i].get_data()[j]));
             }
         }
-        Zs[i] = Zs[i-1] + mean(Z);
+        double meanZ;
+        if(Z.size())
+            meanZ = mean(Z);
+        else
+            meanZ = 0;
+
+        Zs[i] = Zs[i-1] + meanZ;
     }
     // correct data
     for(size_t i=1; i<hists.size(); ++i)
@@ -61,8 +73,11 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         {
             double value = corrected_data[i][j];
             double weight = hists[i].get_data()[j];
-            total += value;
-            total_weight += weight;
+            if(weight > threshold)
+            {
+                total += value * weight;
+                total_weight += weight;
+            }
         }
         out.at(j) = total/total_weight;
     }
