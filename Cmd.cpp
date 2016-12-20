@@ -98,6 +98,12 @@ Cmd::Cmd(int argc, char** argv)
             {
                 LOG(LOG_INFO) << data_path_vector[j];
             }
+            std::ifstream is(data_path_vector[j].c_str());
+            if(!is.good())
+            {
+                LOG(LOG_ERROR) << "Can not read " << data_path_vector[j];
+                exit(3);
+            }
         }
         LOG(LOG_INFO) << "}";
 
