@@ -34,7 +34,6 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
             osCorrected << centers[j] << " " << corrected[j] << "\n";
     }
 
-
     std::vector<double> Zs(hists.size(), 0);
     for(size_t i=1; i<hists.size(); ++i)
     {
@@ -74,8 +73,7 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
             osGlued << hists[i].centers()[j] << " " << corrected_data[i][j] << "\n";
         }
 
-    Histogram out(hists[0].borders());
-
+    std::vector<double> unnormalized_data;
     // get data from all histograms and calculate weighted means
     for(size_t j=0; j<corrected_data[0].size(); ++j)
     {
@@ -93,8 +91,34 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         }
         LOG(LOG_DEBUG) << "total " << total;
         LOG(LOG_DEBUG) << "total weight " << total_weight;
-        out.at(j) = total/total_weight;
+
+        unnormalized_data.push_back(total/total_weight);
     }
+
+    std::vector<double> expData;
+    std::vector<double> expCenters;
+    // find largest element and normalize all to avoid numerical problems
+    double m = 0;
+    for(auto i : unnormalized_data)
+        if(i>m)
+            m = i;
+
+    for(size_t i=0; i<unnormalized_data.size(); ++i)
+    {
+        // avoid nan, would result in a nan area
+        // this should also work with -ffast-math
+        if(unnormalized_data[i] > 1e-300 && unnormalized_data[i] < 1e300)
+        {
+            expData.push_back(std::exp(unnormalized_data[i]-m));
+            expCenters.push_back(hists[0].centers()[i]);
+        }
+    }
+    double logArea = m + std::log(trapz(expCenters, expData));
+    LOG(LOG_INFO) << " area: " << logArea;
+
+    Histogram out(hists[0].borders());
+    for(size_t i=0; i<unnormalized_data.size(); ++i)
+        out.at(i) = unnormalized_data[i] - logArea;
 
     return out;
 }

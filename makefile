@@ -16,7 +16,7 @@ endif
 
 VERSION := $(shell git describe --tags --always)
 
-release: CXXFLAGS += -O3 -flto -mtune=native -mtune=corei7 -ffast-math -fno-strict-aliasing
+release: CXXFLAGS += -O3 -flto -mtune=native -mtune=corei7 -fno-strict-aliasing
 release: VERSION += release
 release: all
 silent: CXXFLAGS += -DNLOG
