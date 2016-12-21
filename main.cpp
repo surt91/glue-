@@ -30,7 +30,7 @@ int main(int argc, char** argv)
         o.lowerBound = 1e300;
         o.upperBound = -1e300;
         // unzip, if it ends on .gz
-        for(auto file : o.border_path_vector)
+        for(auto &file : o.border_path_vector)
         {
             LOG(LOG_INFO) << "read: " << file;
             if(has_suffix(file, ".gz"))
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        for(auto h : histograms)
+        for(auto &h : histograms)
             std::cout << h.ascii_table();
     }
 }

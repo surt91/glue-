@@ -14,15 +14,15 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
     std::ofstream osHist(histname);
     std::ofstream osCorrected(correctedname);
     std::ofstream osGlued(gluedname);
-    for(auto h : hists)
+    for(auto &h : hists)
         osHist << h.ascii_table();
 
     std::vector<std::vector<double>> corrected_data;
     for(size_t i=0; i<hists.size(); ++i)
     {
-        const auto data = hists[i].get_data();
-        const auto centers = hists[i].centers();
-        const double theta = thetas[i];
+        const auto &data = hists[i].get_data();
+        const auto &centers = hists[i].centers();
+        const double &theta = thetas[i];
 
         std::vector<double> corrected;
         for(size_t j=0; j<data.size(); ++j)
@@ -37,12 +37,12 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
     std::vector<double> Zs(hists.size(), 0);
     for(size_t i=1; i<hists.size(); ++i)
     {
-        const auto count1 = hists[i-1].get_data();
-        const auto count2 = hists[i].get_data();
-        const auto data1 = corrected_data[i-1];
-        const auto data2 = corrected_data[i];
-        const auto centers1 = hists[i-1].centers();
-        const auto centers2 = hists[i].centers();
+        const auto &count1 = hists[i-1].get_data();
+        const auto &count2 = hists[i].get_data();
+        const auto &data1 = corrected_data[i-1];
+        const auto &data2 = corrected_data[i];
+        const auto &centers1 = hists[i-1].centers();
+        const auto &centers2 = hists[i].centers();
 
         std::vector<double> Z;
         std::vector<double> weight; // how to weight the data, to get the mean of Z
