@@ -20,3 +20,14 @@ bool has_suffix(const std::string &str, const std::string &suffix)
     return str.size() >= suffix.size() &&
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
+
+void write_out(std::string file, std::string text)
+{
+    if(file == "" || file == "-")
+        std::cout << text;
+    else
+    {
+        std::ofstream os(file, std::ios::app);
+        os << text;
+    }
+}

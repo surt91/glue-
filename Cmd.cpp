@@ -111,6 +111,15 @@ Cmd::Cmd(int argc, char** argv)
         LOG(LOG_INFO) << "Paths to get the borders from {" << border_path_vector << "}";
 
         output = outputArg.getValue();
+        if(output != "" && output != "-")
+        {
+            std::ofstream os(output);
+            if(!os.good())
+            {
+                LOG(LOG_ERROR) << "Can not write " << output;
+                exit(4);
+            }
+        }
         LOG(LOG_INFO) << "target path                " << output;
     }
     catch(TCLAP::ArgException &e)  // catch any exceptions

@@ -5,6 +5,8 @@
 
 #include "Histogram.hpp"
 
+void write_out(std::string file, std::string text);
+
 template<class T>
 std::string getNextLine(T &instream)
 {

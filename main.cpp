@@ -88,12 +88,14 @@ int main(int argc, char** argv)
     if(o.data_path_vector.size() > 1)
     {
         Histogram h = glueHistograms(histograms, o.thetas, 100);
-        std::cout << h.ascii_table();
+        write_out(o.output, h.ascii_table());
     }
     else
     {
         for(auto &h : histograms)
-            std::cout << h.ascii_table();
+        {
+            write_out(o.output, h.ascii_table());
+        }
     }
 
     std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
