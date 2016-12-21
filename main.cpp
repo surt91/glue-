@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         #pragma omp parallel for reduction(min:lower), reduction(max:upper)
         for(size_t i=0; i<o.border_path_vector.size(); ++i)
         {
-            auto &file = o.border_path_vector[i];
+            const auto &file = o.border_path_vector[i];
             LOG(LOG_DEBUG) << "read: " << file;
             // unzip, if it ends on .gz
             if(has_suffix(file, ".gz"))
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     #pragma omp parallel for
     for(size_t i=0; i<o.data_path_vector.size(); ++i)
     {
-        auto &file = o.data_path_vector[i];
+        const auto &file = o.data_path_vector[i];
         LOG(LOG_DEBUG) << "read: " << file;
         // unzip, if it ends on .gz
         if(has_suffix(file, ".gz"))
