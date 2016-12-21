@@ -1,6 +1,7 @@
 #include <random>
 #include <vector>
 #include <algorithm>
+#include <chrono>
 
 #include <fstream>
 #include "gzstream/gzstream.h"
@@ -12,6 +13,8 @@
 
 int main(int argc, char** argv)
 {
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
     Cmd o(argc, argv);
 
     // if no borders are given, determine the borders from the first
@@ -53,12 +56,17 @@ int main(int argc, char** argv)
         LOG(LOG_INFO) << "use range [" << o.lowerBound << ", " << o.upperBound<< "]";
     }
 
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+    LOG(LOG_TIMING) << "determining borders " << time_span.count() << "s";
+
     std::vector<Histogram> histograms(o.data_path_vector.size());
 
     #pragma omp parallel for
     for(size_t i=0; i<o.data_path_vector.size(); ++i)
     {
         auto &file = o.data_path_vector[i];
+        LOG(LOG_INFO) << "read: " << file;
         // unzip, if it ends on .gz
         if(has_suffix(file, ".gz"))
         {
@@ -73,6 +81,10 @@ int main(int argc, char** argv)
         }
     }
 
+    std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t3 - t2);
+    LOG(LOG_TIMING) << "reading files and generating histograms " << time_span.count() << "s";
+
     if(o.data_path_vector.size() > 1)
     {
         Histogram h = glueHistograms(histograms, o.thetas, 100);
@@ -83,4 +95,8 @@ int main(int argc, char** argv)
         for(auto &h : histograms)
             std::cout << h.ascii_table();
     }
+
+    std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
+    LOG(LOG_TIMING) << "glueing histograms " << time_span.count() << "s";
 }
