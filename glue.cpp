@@ -89,8 +89,6 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
                 total_weight += weight;
             }
         }
-        LOG(LOG_DEBUG) << "total " << total;
-        LOG(LOG_DEBUG) << "total weight " << total_weight;
 
         unnormalized_data.push_back(total/total_weight);
     }
@@ -114,7 +112,7 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         }
     }
     double logArea = m + std::log(trapz(expCenters, expData));
-    LOG(LOG_INFO) << " area: " << logArea;
+    LOG(LOG_DEBUG) << "area: " << logArea;
 
     Histogram out(hists[0].borders());
     for(size_t i=0; i<unnormalized_data.size(); ++i)
