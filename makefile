@@ -27,6 +27,7 @@ debug: VERSION += debug
 debug: all
 
 CXXFLAGS += -DVERSION="\"$(VERSION)\""
+CXXFLAGS += -fopenmp
 
 # for clang sanitizers
 #CXX = clang++

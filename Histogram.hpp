@@ -29,6 +29,7 @@ class Histogram
         std::vector<double> data; ///< data inside the bins
 
     public:
+        Histogram(){};
         Histogram(const int bins, const double lower, const double upper);
         Histogram(const std::vector<double> bins);
 

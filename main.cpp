@@ -48,21 +48,23 @@ int main(int argc, char** argv)
         LOG(LOG_INFO) << "use range [" << o.lowerBound << ", " << o.upperBound<< "]";
     }
 
-    // TODO: read the files in parallel with openMP
-    std::vector<Histogram> histograms;
-    for(auto &file : o.data_path_vector)
+    std::vector<Histogram> histograms(o.data_path_vector.size());
+
+    #pragma omp parallel for
+    for(size_t i=0; i<o.data_path_vector.size(); ++i)
     {
+        auto &file = o.data_path_vector[i];
         // unzip, if it ends on .gz
         if(has_suffix(file, ".gz"))
         {
             igzstream is(file.c_str());
-            histograms.emplace_back(histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column));
+            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column);
         }
         // otherwise try to read it as a normal file
         else
         {
             std::ifstream is(file.c_str());
-            histograms.emplace_back(histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column));
+            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column);
         }
     }
 
