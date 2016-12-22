@@ -17,11 +17,13 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
     for(auto &h : hists)
         osHist << h.ascii_table();
 
+    // centers of all histograms should be equal
+    const auto &centers = hists[0].centers();
+
     std::vector<std::vector<double>> corrected_data;
     for(size_t i=0; i<hists.size(); ++i)
     {
         const auto &data = hists[i].get_data();
-        const auto &centers = hists[i].centers();
         const double &theta = thetas[i];
 
         std::vector<double> corrected;
@@ -41,8 +43,6 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         const auto &count2 = hists[i].get_data();
         const auto &data1 = corrected_data[i-1];
         const auto &data2 = corrected_data[i];
-        const auto &centers1 = hists[i-1].centers();
-        const auto &centers2 = hists[i].centers();
 
         std::vector<double> Z;
         std::vector<double> weight; // how to weight the data, to get the mean of Z
@@ -70,7 +70,7 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         for(size_t j=0; j<corrected_data[i].size(); ++j)
         {
             corrected_data[i][j] += Zs[i];
-            osGlued << hists[i].centers()[j] << " " << corrected_data[i][j] << "\n";
+            osGlued << centers[j] << " " << corrected_data[i][j] << "\n";
         }
 
     std::vector<double> unnormalized_data;
