@@ -22,9 +22,10 @@ class Cmd
         std::vector<std::string> border_path_vector;  ///< vector of of input files used to determine the borders
 
         std::string text;                             ///< the full command used to start this program
-        std::vector<double> thetas;                           ///< temperatures of the files in the same order
+        std::vector<double> thetas;                   ///< temperatures of the files in the same order
 
-        int column;
+        int column;                                   ///< in which column of the file is the interesting data
+        int skip;                                     ///< how many lines to skip of the file (~ equilibration time)
 
         double lowerBound, upperBound;
         int num_bins;

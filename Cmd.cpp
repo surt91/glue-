@@ -38,6 +38,7 @@ Cmd::Cmd(int argc, char** argv)
         TCLAP::ValueArg<int> numBinsArg("B", "bins", "number of bins", false, 100, "int", cmd);
         TCLAP::MultiArg<double> thetaArg("T", "theta", "temperatures corresponding to the input files", false, "double", cmd);
         TCLAP::ValueArg<int> columnArg("c", "column", "in which column is the data", false, 0, "int", cmd);
+        TCLAP::ValueArg<int> skipArg("s", "skip", "how many lines to skip", false, 0, "int", cmd);
 
         // switch argument
         // -short, --long, description, default
@@ -74,6 +75,8 @@ Cmd::Cmd(int argc, char** argv)
 
         column = columnArg.getValue();
         LOG(LOG_INFO) << "column                     " << column;
+        skip = skipArg.getValue();
+        LOG(LOG_INFO) << "skip                       " << skip;
 
         data_path_vector = dataPathArg.getValue();
         thetas = thetaArg.getValue();
