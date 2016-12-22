@@ -61,10 +61,6 @@ endif
 obj dep:
 	mkdir $@
 
-# compile the parts containing the version new, after changes to git
-# compare http://stackoverflow.com/a/6526504/1698412
-obj/main.o: .git/HEAD .git/index
-
 # perfect dependencies, see https://www.gnu.org/software/make/manual/make.pdf
 dep/%.d: %.cpp | dep
 	@echo Dep: $@
