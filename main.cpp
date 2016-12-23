@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         {
             igzstream is(file.c_str());
             double tau = tauFromStream(is, o.column, o.skip);
-            LOG(LOG_DEBUG) << "tau = " << tau;
+            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << tau;
             histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, std::ceil(2*tau));
         }
         // otherwise try to read it as a normal file
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
         {
             std::ifstream is(file.c_str());
             double tau = tauFromStream(is, o.column, o.skip);
-            LOG(LOG_DEBUG) << "tau = " << tau;
+            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << tau;
             histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, std::ceil(2*tau));
         }
     }
