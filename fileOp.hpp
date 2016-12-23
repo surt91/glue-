@@ -108,7 +108,7 @@ double tauFromStream(T &instream, int column=0, int skip=0)
     //~ int num_samples = 256;
     //~ int num_samples = 1024;
     //~ int num_samples = 512;
-    double tau;
+    double tau = 1;
     while(instream.good())
     {
         std::string line = getNextLine(instream);
