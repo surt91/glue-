@@ -104,8 +104,10 @@ double tauFromStream(T &instream, int column=0, int skip=0)
     int ctr = 0;
     std::vector<double> sample;
     // use this many samples to determine the autocorrelation time
+    int num_samples = 64;
     //~ int num_samples = 256;
-    int num_samples = 1024;
+    //~ int num_samples = 1024;
+    //~ int num_samples = 512;
     double tau;
     while(instream.good())
     {
@@ -124,7 +126,7 @@ double tauFromStream(T &instream, int column=0, int skip=0)
             tau = autocorrelationTime(sample);
             // if the autocorrelation time is of the same order of the
             // number of samples, try again with more samples
-            if(tau > num_samples/10.)
+            if(tau > num_samples/100.)
                 num_samples *= 2;
             else
                 break;

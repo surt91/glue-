@@ -5,12 +5,14 @@
 #include <vector>
 #include <cassert>
 
+/// calculates the mean of a vector
 template <typename T>
 T mean(std::vector<T> a)
 {
     return std::accumulate(a.begin(), a.end(), T(0.0)) / a.size();
 }
 
+/// calculates a weighted mean
 template <typename T>
 T weighted_mean(std::vector<T> a, std::vector<double> weight)
 {

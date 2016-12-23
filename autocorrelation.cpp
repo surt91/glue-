@@ -59,8 +59,6 @@ double autocorrelationTime(const std::vector<double> &timeseries)
         if(numbers[i].r < 0)
             break;
 
-        //~ std::cout << numbers[i].r/numbers[0].r << "\n";
-
         tau += numbers[i].r/numbers[0].r;
     }
 
