@@ -9,6 +9,7 @@
 #include "Cmd.hpp"
 #include "fileOp.hpp"
 #include "glue.hpp"
+#include "autocorrelation.hpp"
 
 /**
  * \mainpage glue++
@@ -76,13 +77,17 @@ int main(int argc, char** argv)
         if(has_suffix(file, ".gz"))
         {
             igzstream is(file.c_str());
-            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip);
+            double tau = tauFromStream(is, o.column, o.skip);
+            LOG(LOG_DEBUG) << "tau = " << tau;
+            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, 2*tau);
         }
         // otherwise try to read it as a normal file
         else
         {
             std::ifstream is(file.c_str());
-            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip);
+            double tau = tauFromStream(is, o.column, o.skip);
+            LOG(LOG_DEBUG) << "tau = " << tau;
+            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, 2*tau);
         }
     }
 

@@ -4,6 +4,8 @@
 #include <fstream>
 
 #include "Histogram.hpp"
+#include "autocorrelation.hpp"
+
 bool has_suffix(const std::string &str, const std::string &suffix);
 
 void write_out(std::string file, std::string text);
@@ -39,7 +41,7 @@ std::string getNextLine(T &instream)
  *  \param skip         skip the first lines of the input stream
  */
 template<class T>
-Histogram histogramFromStream(T &instream, int num_bins, double lower, double upper, int column=0, int skip=0)
+Histogram histogramFromStream(T &instream, int num_bins, double lower, double upper, int column=0, int skip=0, int step=1)
 {
     Histogram h(num_bins, lower, upper);
 
@@ -47,9 +49,11 @@ Histogram histogramFromStream(T &instream, int num_bins, double lower, double up
     while(instream.good())
     {
         std::string line = getNextLine(instream);
+        if(line.empty() || line[0] == '#')
+            continue;
         if(ctr++ < skip)
             continue;
-        if(line.empty())
+        if((ctr-skip) % step)
             continue;
         std::string word = getNthWord(line, column);
 
@@ -69,15 +73,17 @@ Histogram histogramFromStream(T &instream, int num_bins, double lower, double up
  *  \param          skip         skip the first lines of the input stream
  */
 template<class T>
-void bordersFromStream(T &instream, double &lower, double &upper, int column=0, int skip=0)
+void bordersFromStream(T &instream, double &lower, double &upper, int column=0, int skip=0, int step=1)
 {
     int ctr = 0;
     while(instream.good())
     {
         std::string line = getNextLine(instream);
+        if(line.empty() || line[0] == '#')
+            continue;
         if(ctr++ < skip)
             continue;
-        if(line.empty())
+        if((ctr-skip) % step)
             continue;
         std::string word = getNthWord(line, column);
 
@@ -92,3 +98,37 @@ void bordersFromStream(T &instream, double &lower, double &upper, int column=0, 
     upper += 0.05*(upper-lower);
 }
 
+template<class T>
+double tauFromStream(T &instream, int column=0, int skip=0)
+{
+    int ctr = 0;
+    std::vector<double> sample;
+    // use this many samples to determine the autocorrelation time
+    //~ int num_samples = 256;
+    int num_samples = 1024;
+    double tau;
+    while(instream.good())
+    {
+        std::string line = getNextLine(instream);
+        if(ctr++ < skip)
+            continue;
+        if(line.empty())
+            continue;
+        std::string word = getNthWord(line, column);
+
+        double number = std::stod(word);
+        sample.push_back(number);
+
+        if(ctr-skip == num_samples)
+        {
+            tau = autocorrelationTime(sample);
+            // if the autocorrelation time is of the same order of the
+            // number of samples, try again with more samples
+            if(tau > num_samples/10.)
+                num_samples *= 2;
+            else
+                break;
+        }
+    }
+    return tau;
+}
