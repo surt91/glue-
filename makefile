@@ -42,11 +42,11 @@ WARNLEVEL= -Wall -Wextra -Wpedantic -Werror -Wno-unknown-pragmas
 
 LNDIRS  =
 
-INCLUDES = -Itclap/include
+INCLUDES = -Itclap/include -Ikissfft
 
 CXXFLAGS += $(INCLUDES)
 
-LIBS = -lm -lz
+LIBS = -lm -lz kissfft/libkissfft.a
 LFLAGS	= $(LNDIRS) $(LIBS)
 
 all: $(DEP) $(TARGET)

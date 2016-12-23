@@ -4,3 +4,6 @@
 [submodule "tclap"]
 	path = tclap
 	url = git@github.com:mirror/tclap.git
+[submodule "kissfft"]
+	path = kissfft
+	url = git@github.com:surt91/kissfft.git
