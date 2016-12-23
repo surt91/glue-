@@ -10,6 +10,11 @@
 #include "fileOp.hpp"
 #include "glue.hpp"
 
+/**
+ * \mainpage glue++
+ *
+ *
+ */
 
 int main(int argc, char** argv)
 {

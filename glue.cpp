@@ -1,11 +1,29 @@
 #include "glue.hpp"
 
-double correct_bias(double s, double theta, double p_s)
+/** Correct the bias introduced by the temperature based Metropolis sampling.
+ *
+ *  Since all values are logarithms, this is numerically stable.
+ *
+ * \f[ \frac{1}{Z_\Theta} P(S) = e^{S/\Theta} P_{\Theta} \f]
+ *
+ * \param s         value of the observable
+ * \param theta     temperature where s were sampled
+ * \param p_theta   (unnormalized) probability to find s at theta
+ */
+double correct_bias(double s, double theta, double p_theta)
 {
-    // std::exp(s/theta) * p_s;, but calculate only logarithms
-    return s/theta + std::log(p_s);
+    // std::exp(s/theta) * p_theta;, but calculate only logarithms
+    return s/theta + std::log(p_theta);
 }
 
+/** Determine the normalization constants \f$ Z_\Theta \f$.
+ *
+ *  The histograms need to have the same borders.
+ *
+ *  \param hists        vector of histograms to glue
+ *  \param thetas       temperatures for each histogram such that hists[i] is sampled at thetas[i]
+ *  \param threshold    how many entries should a bin have to be considered for determination of \f$ Z_\Theta \f$
+ */
 Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> thetas, int threshold)
 {
     std::string histname = "hist.dat";

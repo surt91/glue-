@@ -1,4 +1,5 @@
 TARGET	= glue++
+DOC 	= manual.pdf
 
 CXXFLAGS = -std=c++11 -fexceptions -pipe
 
@@ -76,6 +77,21 @@ obj/%.o: %.cpp | obj
 
 $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ) $(LFLAGS)
+
+doc/mathjax.zip:
+	mkdir -p doc/html/
+	wget -c https://codeload.github.com/mathjax/MathJax/zip/master -O doc/mathjax.zip
+
+doc/mathjax: | doc/mathjax.zip
+	unzip -qud doc/ doc/mathjax.zip
+	mv doc/MathJax-master doc/mathjax
+
+doc: $(DOC)
+$(DOC): doc.conf *.cpp *.hpp | doc/mathjax
+	doxygen doc.conf
+	$(MAKE) -C doc/latex clean
+	$(MAKE) -C doc/latex
+	cp doc/latex/refman.pdf $@
 
 proper:
 	rm -rf $(OBJ)
