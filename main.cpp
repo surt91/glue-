@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 
     std::vector<Histogram> histograms(o.data_path_vector.size());
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic,1)
     for(size_t i=0; i<o.data_path_vector.size(); ++i)
     {
         const auto &file = o.data_path_vector[i];
