@@ -46,9 +46,19 @@ void updateBorders(Cmd &o)
             const auto &file = o.border_path_vector[i];
             LOG(LOG_DEBUG) << "read: " << file;
 
-            // igzstream can also read plain files
-            igzstream is(file.c_str());
-            bordersFromStream(is, lower, upper, o.column, o.skip);
+            if(isHistogramFile(file))
+            {
+                Histogram h(file);
+                lower = std::min(lower, h.borders().front());
+                upper = std::max(upper, h.borders().back());
+                o.num_bins = h.get_num_bins();
+            }
+            else
+            {
+                // igzstream can also read plain files
+                igzstream is(file.c_str());
+                bordersFromStream(is, lower, upper, o.column, o.skip);
+            }
         }
         o.lowerBound = lower;
         o.upperBound = upper;
