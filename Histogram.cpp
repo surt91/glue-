@@ -272,15 +272,27 @@ void Histogram::readFromFile(const std::string filename)
     ss.str(lineBorders);
     while (std::getline(ss, item, ' '))
         bins.push_back(std::stod(item));
-
-    num_bins = bins.size()-1;
-    lower = bins.front();
-    upper = bins.back();
     ss. clear();
 
     ss.str(lineData);
     while (std::getline(ss, item, ' '))
         data.push_back(std::stod(item));
+
+    // test if we loaded centers (some of my simulations save centers)
+    if(bins.size() == data.size())
+    {
+        // transform centers to borders
+        // this does only work with equidistant histograms
+        // though it should be good enough for any type
+        const double width2 = (bins[1]-bins[0])/2;
+        for(size_t i=0; i<bins.size(); ++i)
+            bins[i] -= width2;
+        bins.push_back(bins.back() + width2);
+    }
+
+    num_bins = bins.size()-1;
+    lower = bins.front();
+    upper = bins.back();
 
     if(bins.size() != data.size() + 1)
     {
