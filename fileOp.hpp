@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "gzstream/gzstream.h"
+
 #include "Histogram.hpp"
 #include "autocorrelation.hpp"
 
@@ -10,6 +12,9 @@ bool has_suffix(const std::string &str, const std::string &suffix);
 
 void write_out(std::string file, std::string text);
 std::string getNthWord(const std::string &line, int n);
+
+bool isHistogramFile(std::string filename);
+bool fileReadable(std::string filename);
 
 /** Get the next line from an input stream.
  *

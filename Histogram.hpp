@@ -4,6 +4,8 @@
 #include <algorithm>
 
 #include <sstream>
+#include <iostream>
+#include <fstream>
 
 #include "Logging.hpp"
 
@@ -29,9 +31,10 @@ class Histogram
         std::vector<double> data; ///< data inside the bins
 
     public:
-        Histogram(){};
+        Histogram();
         Histogram(const int bins, const double lower, const double upper);
         Histogram(const std::vector<double> bins);
+        Histogram(const std::string filename);
 
         void add(double where, double what=1);
         double& at(int idx);
@@ -43,6 +46,9 @@ class Histogram
         int count() const;
         void reset();
         void trim();
+
+        void writeToFile(const std::string filename) const;
+        void readFromFile(const std::string filename);
 
         const std::vector<double> centers() const;
         const std::vector<double>& borders() const;

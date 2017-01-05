@@ -52,3 +52,27 @@ void write_out(std::string file, std::string text)
         os << text;
     }
 }
+
+/** tests if the given file contains a histogram, i.e. is too short for
+ * a datafile.
+ *
+ * this is suboptimal and a dirty hack that needs to die
+ */
+bool isHistogramFile(std::string filename)
+{
+    igzstream is(filename.c_str());
+    std::string item;
+
+    int ctr = 0;
+    while(std::getline(is, item) && ctr < 5)
+        ++ctr;
+
+    return ctr < 4;
+}
+
+bool fileReadable(std::string filename)
+{
+    std::ifstream is(filename.c_str());
+    LOG(LOG_DEBUG) << filename << " " << is.good();
+    return is.good();
+}

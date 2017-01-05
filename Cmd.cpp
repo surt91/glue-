@@ -39,9 +39,11 @@ Cmd::Cmd(int argc, char** argv)
         TCLAP::MultiArg<double> thetaArg("T", "theta", "temperatures corresponding to the input files", false, "double", cmd);
         TCLAP::ValueArg<int> columnArg("c", "column", "in which column is the data", false, 0, "int", cmd);
         TCLAP::ValueArg<int> skipArg("s", "skip", "how many lines to skip", false, 0, "int", cmd);
+        TCLAP::ValueArg<int> stepArg("S", "step", "read only every nth line", false, 0, "int", cmd);
 
         // switch argument
         // -short, --long, description, default
+        TCLAP::SwitchArg forceSwitch("f", "force", "forces the reevaluation of the raw data", cmd, false);
         TCLAP::SwitchArg quietSwitch("q", "quiet", "quiet mode, log only to file (if specified) and not to stdout", cmd, false);
 
         // Parse the argv array.
@@ -67,6 +69,9 @@ Cmd::Cmd(int argc, char** argv)
 
         LOG(LOG_INFO) << "Logging to " << Logger::logfilename;
 
+        force = forceSwitch.getValue();
+        LOG(LOG_INFO) << "force reread               " << force;
+
         upperBound = upperArg.getValue();
         lowerBound = lowerArg.getValue();
         num_bins = numBinsArg.getValue();
@@ -77,10 +82,12 @@ Cmd::Cmd(int argc, char** argv)
         LOG(LOG_INFO) << "column                     " << column;
         skip = skipArg.getValue();
         LOG(LOG_INFO) << "skip                       " << skip;
+        step = stepArg.getValue();
+        LOG(LOG_INFO) << "step                       " << step;
 
         data_path_vector = dataPathArg.getValue();
         thetas = thetaArg.getValue();
-        if(data_path_vector.size() == 0)
+        if(data_path_vector.size()  == 0)
         {
             LOG(LOG_ERROR) << "You need at least one input file";
             exit(2);
@@ -99,7 +106,7 @@ Cmd::Cmd(int argc, char** argv)
             }
             else
             {
-                LOG(LOG_INFO) << data_path_vector[j];
+                LOG(LOG_INFO) << "  " << data_path_vector[j];
             }
             std::ifstream is(data_path_vector[j].c_str());
             if(!is.good())

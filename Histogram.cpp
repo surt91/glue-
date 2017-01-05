@@ -1,5 +1,14 @@
 #include "Histogram.hpp"
 
+Histogram::Histogram()
+    : m_cur_min(0),
+      m_total(0),
+      m_sum(0),
+      above(0),
+      below(0)
+{
+}
+
 Histogram::Histogram(const int num_bins, const double lower, const double upper)
     : num_bins(num_bins),
       lower(lower),
@@ -30,6 +39,16 @@ Histogram::Histogram(const std::vector<double> bins)
       bins(bins),
       data(num_bins, 0)
 {
+}
+
+Histogram::Histogram(const std::string filename)
+    : m_cur_min(0),
+      m_total(0),
+      m_sum(0),
+      above(0),
+      below(0)
+{
+    readFromFile(filename);
 }
 
 /** Adds an entry to the corresponding bin.
@@ -212,6 +231,62 @@ const std::string Histogram::ascii_table() const
     for(int i=0; i<num_bins; ++i)
         ss << c[i] << " " << d[i] << "\n";
     return ss.str();
+}
+
+/// save the histogram to a file, can be loaded by Histogram::readFromFile
+void Histogram::writeToFile(const std::string filename) const
+{
+    std::ofstream os(filename);
+    if(!os.good())
+    {
+        LOG(LOG_ERROR) << "can not write " << filename;
+    }
+
+    for(const auto &i : bins)
+        os << i << " ";
+    os << "\n";
+
+    for(const auto &i : data)
+        os << i << " ";
+    os << "\n";
+}
+
+// load a histogram to a file, as saved by Histogram::writeToFile
+void Histogram::readFromFile(const std::string filename)
+{
+    std::ifstream is(filename);
+    if(!is.good())
+    {
+        LOG(LOG_ERROR) << "can not read " << filename;
+    }
+
+    // the format is pretty strict: 2 lines, in the first borders
+    // separated by space, in the second counts separated by whitespace
+    std::string lineBorders, lineData;
+    std::getline(is, lineBorders);
+    std::getline(is, lineData);
+
+    std::string item;
+    std::stringstream ss;
+
+    ss.str(lineBorders);
+    while (std::getline(ss, item, ' '))
+        bins.push_back(std::stod(item));
+
+    num_bins = bins.size()-1;
+    lower = bins.front();
+    upper = bins.back();
+    ss. clear();
+
+    ss.str(lineData);
+    while (std::getline(ss, item, ' '))
+        data.push_back(std::stod(item));
+
+    if(bins.size() != data.size() + 1)
+    {
+        LOG(LOG_ERROR) << "expected one more bin border than data, "
+                          "got " << bins.size() << " and " << data.size();
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const Histogram &obj)

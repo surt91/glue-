@@ -17,11 +17,12 @@
  *
  */
 
-int main(int argc, char** argv)
+/** If the borders have their default values ([0, 0]), obtain
+ * tight borders from the files
+ */
+void updateBorders(Cmd &o)
 {
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-
-    Cmd o(argc, argv);
 
     // if no borders are given, determine the borders from the first
     // and the last of the given data files
@@ -44,18 +45,10 @@ int main(int argc, char** argv)
         {
             const auto &file = o.border_path_vector[i];
             LOG(LOG_DEBUG) << "read: " << file;
-            // unzip, if it ends on .gz
-            if(has_suffix(file, ".gz"))
-            {
-                igzstream is(file.c_str());
-                bordersFromStream(is, lower, upper, o.column, o.skip);
-            }
-            // otherwise try to read it as a normal file
-            else
-            {
-                std::ifstream is(file.c_str());
-                bordersFromStream(is, lower, upper, o.column, o.skip);
-            }
+
+            // igzstream can also read plain files
+            igzstream is(file.c_str());
+            bordersFromStream(is, lower, upper, o.column, o.skip);
         }
         o.lowerBound = lower;
         o.upperBound = upper;
@@ -65,6 +58,39 @@ int main(int argc, char** argv)
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     LOG(LOG_TIMING) << "determining borders " << time_span.count() << "s";
+}
+
+/** test if all borders are the same
+ *
+ * This is important, since the glueing needs them to be the same.
+ * If we load finished histograms, we do not have control over
+ * the borders.
+ */
+bool sameBorders(std::vector<Histogram> histograms)
+{
+    const std::vector<double> &reference = histograms[0].borders();
+    for(size_t i=1; i<histograms.size(); ++i)
+    {
+        const std::vector<double> &cmp = histograms[i].borders();
+        if(reference.size() != cmp.size())
+            return false;
+        for(size_t j=0; j<reference.size(); ++j)
+            if(reference[j] != cmp[j])
+                return false;
+
+    }
+    return true;
+}
+
+/** Create Histograms from the specified files.
+ *
+ * If the files are already histograms or if there is an already
+ * calculated cached histogram, use those, otherwise generate the
+ * histograms from raw data.
+ */
+std::vector<Histogram> createHistograms(Cmd &o)
+{
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 
     std::vector<Histogram> histograms(o.data_path_vector.size());
 
@@ -73,27 +99,64 @@ int main(int argc, char** argv)
     {
         const auto &file = o.data_path_vector[i];
         LOG(LOG_DEBUG) << "read: " << file;
-        // unzip, if it ends on .gz
-        if(has_suffix(file, ".gz"))
+
+        // first test, if the file already contains a histogram (is it shorter than 5 lines)
+        // next test, if there is a file with the same name but ending .hist
+        // then test, if o.lower/upper and num bins are the same, if not discard
+        // else evaluate the datafile
+
+        Histogram tmp_hist;
+        if(isHistogramFile(file) && !o.force)
+            tmp_hist = Histogram(file);
+        else if(fileReadable(file+".hist") && !o.force)
+            tmp_hist = Histogram(file+".hist");
+
+        if(tmp_hist.get_num_bins() == o.num_bins
+        && std::abs(o.lowerBound - tmp_hist.borders().front()) < 1e-1
+        && std::abs(o.upperBound - tmp_hist.borders().back()) < 1e-1
+        && !o.force)
         {
-            igzstream is(file.c_str());
-            double tau = tauFromStream(is, o.column, o.skip);
-            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << tau;
-            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, std::ceil(2*tau));
+            histograms[i] = std::move(tmp_hist);
+            LOG(LOG_DEBUG) << "load histogram for " << file;
         }
-        // otherwise try to read it as a normal file
         else
         {
-            std::ifstream is(file.c_str());
-            double tau = tauFromStream(is, o.column, o.skip);
-            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << tau;
-            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, std::ceil(2*tau));
+            LOG(LOG_DEBUG) << "calculate histogram for " << file;
+
+            if(!o.step)
+            {
+                // igzstream can also read plain files
+                igzstream is(file.c_str());
+                double tau = tauFromStream(is, o.column, o.skip);
+                o.step = std::ceil(2*tau);
+            }
+
+            // I can not reset the igzstream somehow
+            igzstream is(file.c_str());
+            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << o.step;
+            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, o.step);
+
+            // save histogram to load it the next time ~ cache
+            histograms[i].writeToFile(file + ".hist");
         }
     }
 
     std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
-    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t3 - t2);
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t3 - t2);
     LOG(LOG_TIMING) << "reading files and generating histograms " << time_span.count() << "s";
+
+    return histograms;
+}
+
+int main(int argc, char** argv)
+{
+    Cmd o(argc, argv);
+
+    updateBorders(o);
+
+    std::vector<Histogram> histograms = createHistograms(o);
+
+    std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 
     if(o.data_path_vector.size() > 1)
     {
@@ -109,6 +172,6 @@ int main(int argc, char** argv)
     }
 
     std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
-    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
     LOG(LOG_TIMING) << "glueing histograms " << time_span.count() << "s";
 }

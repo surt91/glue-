@@ -26,7 +26,10 @@ class Cmd
 
         int column;                                   ///< in which column of the file is the interesting data
         int skip;                                     ///< how many lines to skip of the file (~ equilibration time)
+        int step;                                     ///< only read every nth line (~ autocorrelation time)
 
         double lowerBound, upperBound;
         int num_bins;
+
+        bool force;
 };
