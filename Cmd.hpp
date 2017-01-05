@@ -7,6 +7,14 @@
 
 #include "Logging.hpp"
 
+// test, if we are using openmp
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_thread_num() 0
+   #define omp_set_num_threads(x)
+#endif
+
 /** Command line parser.
  *
  * This command line parser uses TCLAP (http://tclap.sourceforge.net/).
@@ -32,4 +40,6 @@ class Cmd
         int num_bins;
 
         bool force;
+
+        int parallel;
 };

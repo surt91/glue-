@@ -40,6 +40,7 @@ Cmd::Cmd(int argc, char** argv)
         TCLAP::ValueArg<int> columnArg("c", "column", "in which column is the data", false, 0, "int", cmd);
         TCLAP::ValueArg<int> skipArg("s", "skip", "how many lines to skip", false, 0, "int", cmd);
         TCLAP::ValueArg<int> stepArg("S", "step", "read only every nth line", false, 0, "int", cmd);
+        TCLAP::ValueArg<int> parallelArg("p", "parallel", "how many omp threads to use", false, 0, "int", cmd);
 
         // switch argument
         // -short, --long, description, default
@@ -71,6 +72,9 @@ Cmd::Cmd(int argc, char** argv)
 
         force = forceSwitch.getValue();
         LOG(LOG_INFO) << "force reread               " << force;
+        parallel = parallelArg.getValue();
+        LOG(LOG_INFO) << "use parallel threads:      " << parallel;
+        omp_set_num_threads(parallel);
 
         upperBound = upperArg.getValue();
         lowerBound = lowerArg.getValue();
