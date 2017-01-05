@@ -7,6 +7,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "gzstream/gzstream.h"
+
 #include "Logging.hpp"
 
 /** Histogram Class.

@@ -254,7 +254,7 @@ void Histogram::writeToFile(const std::string filename) const
 // load a histogram to a file, as saved by Histogram::writeToFile
 void Histogram::readFromFile(const std::string filename)
 {
-    std::ifstream is(filename);
+    igzstream is(filename.c_str());
     if(!is.good())
     {
         LOG(LOG_ERROR) << "can not read " << filename;
