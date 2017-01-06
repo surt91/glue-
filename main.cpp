@@ -121,10 +121,11 @@ std::vector<Histogram> createHistograms(Cmd &o)
         else if(fileReadable(file+".hist") && !o.force)
             tmp_hist = Histogram(file+".hist");
 
-        if(tmp_hist.get_num_bins() == o.num_bins
+        if(!o.force
+        && tmp_hist.get_num_bins() == o.num_bins
         && std::abs(o.lowerBound - tmp_hist.borders().front()) < 1e-1
         && std::abs(o.upperBound - tmp_hist.borders().back()) < 1e-1
-        && !o.force)
+        )
         {
             histograms[i] = std::move(tmp_hist);
             LOG(LOG_DEBUG) << "load histogram for " << file;
