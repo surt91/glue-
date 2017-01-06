@@ -44,6 +44,7 @@ Cmd::Cmd(int argc, char** argv)
 
         // switch argument
         // -short, --long, description, default
+        TCLAP::SwitchArg bootstrapSwitch("b", "bootstrap", "perform bootstrapping to estimate errors of the bins", cmd, false);
         TCLAP::SwitchArg forceSwitch("f", "force", "forces the reevaluation of the raw data", cmd, false);
         TCLAP::SwitchArg quietSwitch("q", "quiet", "quiet mode, log only to file (if specified) and not to stdout", cmd, false);
 
@@ -72,6 +73,10 @@ Cmd::Cmd(int argc, char** argv)
 
         force = forceSwitch.getValue();
         LOG(LOG_INFO) << "force reread               " << force;
+
+        bootstrap = bootstrapSwitch.getValue();
+        LOG(LOG_INFO) << "bootstrap                  " << bootstrap;
+
         parallel = parallelArg.getValue();
         if(parallel)
             omp_set_num_threads(parallel);

@@ -24,7 +24,7 @@ double correct_bias(double s, double theta, double p_theta)
  *  \param thetas       temperatures for each histogram such that hists[i] is sampled at thetas[i]
  *  \param threshold    how many entries should a bin have to be considered for determination of \f$ Z_\Theta \f$
  */
-Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> thetas, int threshold)
+Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<double> thetas, int threshold)
 {
     std::string histname = "hist.dat";
     std::string correctedname = "corrected.dat";
@@ -39,19 +39,39 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
     const auto &centers = hists[0].centers();
 
     std::vector<std::vector<double>> corrected_data;
-    for(size_t i=0; i<hists.size(); ++i)
+    // if no temperatures are given, do just take the logarithm
+    if(!thetas.empty())
     {
-        const auto &data = hists[i].get_data();
-        const double &theta = thetas[i];
+        for(size_t i=0; i<hists.size(); ++i)
+        {
+            const auto &data = hists[i].get_data();
+            const double &theta = thetas[i];
 
-        std::vector<double> corrected;
-        for(size_t j=0; j<data.size(); ++j)
-            corrected.push_back(correct_bias(centers[j], theta, data[j]));
+            std::vector<double> corrected;
+            for(size_t j=0; j<data.size(); ++j)
+                corrected.push_back(correct_bias(centers[j], theta, data[j]));
 
-        corrected_data.push_back(corrected);
+            corrected_data.push_back(corrected);
 
-        for(size_t j=0; j<data.size(); ++j)
-            osCorrected << centers[j] << " " << corrected[j] << "\n";
+            for(size_t j=0; j<data.size(); ++j)
+                osCorrected << centers[j] << " " << corrected[j] << "\n";
+        }
+    }
+    else
+    {
+        for(size_t i=0; i<hists.size(); ++i)
+        {
+            const auto &data = hists[i].get_data();
+
+            std::vector<double> corrected;
+            for(size_t j=0; j<data.size(); ++j)
+                corrected.push_back(std::log(data[j]));
+
+            corrected_data.push_back(corrected);
+
+            for(size_t j=0; j<data.size(); ++j)
+                osCorrected << centers[j] << " " << corrected[j] << "\n";
+        }
     }
 
     std::vector<double> Zs(hists.size(), 0);
@@ -92,23 +112,31 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         }
 
     std::vector<double> unnormalized_data;
-    // get data from all histograms and calculate weighted means
-    for(size_t j=0; j<corrected_data[0].size(); ++j)
+    if(hists.size() > 1)
     {
-        double total = 0;
-        double total_weight = 0;
-        for(size_t i=0; i<hists.size(); ++i)
+        // get data from all histograms and calculate weighted means
+        for(size_t j=0; j<corrected_data[0].size(); ++j)
         {
-            double value = corrected_data[i][j];
-            double weight = hists[i].get_data()[j];
-            if(weight > threshold)
+            double total = 0;
+            double total_weight = 0;
+            for(size_t i=0; i<hists.size(); ++i)
             {
-                total += value * weight;
-                total_weight += weight;
+                double value = corrected_data[i][j];
+                double weight = hists[i].get_data()[j];
+                if(weight > threshold)
+                {
+                    total += value * weight;
+                    total_weight += weight;
+                }
             }
-        }
 
-        unnormalized_data.push_back(total/total_weight);
+            unnormalized_data.push_back(total/total_weight);
+        }
+    }
+    else
+    {
+        // if we have only one histogram, we do not need to average
+        unnormalized_data = corrected_data[0];
     }
 
     std::vector<double> expData;
@@ -137,4 +165,40 @@ Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> theta
         out.at(i) = unnormalized_data[i] - logArea;
 
     return out;
+}
+
+/** Takes a bootstrap sample of histograms, glues them and returns
+ * a table with an error estimate obtained from bootstrapping.
+ */
+std::string bootstrapGlueing(const std::vector<std::vector<Histogram>> &histograms, const std::vector<double> thetas, int threshold)
+{
+    int num_bins = histograms[0][0].get_num_bins();
+    int n_sample = histograms.size();
+    std::vector<double> centers;
+    std::vector<std::vector<double>> tmp(num_bins);
+
+    centers = histograms[0][0].centers();
+    for(int j=0; j<n_sample; ++j)
+    {
+        Histogram h = glueHistograms(histograms[j], thetas, threshold);
+        for(int i=0; i<num_bins; ++i)
+            tmp[i].push_back(h.at(i));
+    }
+
+    std::vector<double> values(num_bins);
+    std::vector<double> errors(num_bins);
+    for(int i=0; i<num_bins; ++i)
+    {
+        values[i] = mean(tmp[i]);
+        errors[i] = sdev(tmp[i]);
+    }
+
+    std::stringstream table;
+    table << "# centers count error\n";
+    for(int i=0; i<num_bins; ++i)
+    {
+        table << centers[i] << " " << values[i] << " " << errors[i] << "\n";
+    }
+
+    return table.str();
 }

@@ -11,4 +11,5 @@
  *
  * The bins of all histograms need to be the same.
  */
-Histogram glueHistograms(std::vector<Histogram> hists, std::vector<double> thetas, int threshold=0);
+Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<double> thetas=std::vector<double>(), int threshold=0);
+std::string bootstrapGlueing(const std::vector<std::vector<Histogram>> &histograms, const std::vector<double> thetas=std::vector<double>(), int threshold=0);

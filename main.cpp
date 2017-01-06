@@ -154,7 +154,58 @@ std::vector<Histogram> createHistograms(Cmd &o)
 
     std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t3 - t2);
-    LOG(LOG_TIMING) << "reading files and generating histograms " << time_span.count() << "s";
+    LOG(LOG_TIMING) << "reading files and creating histograms " << time_span.count() << "s";
+
+    return histograms;
+}
+
+std::vector<std::vector<Histogram>> bootstrapHistograms(Cmd &o, int n_sample, int seed=0)
+{
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+    std::vector<std::vector<Histogram>> histograms(n_sample);
+    for(int i=0; i<n_sample; ++i)
+        histograms[i].resize(o.data_path_vector.size());
+
+    #pragma omp parallel for schedule(dynamic,1)
+    for(size_t i=0; i<o.data_path_vector.size(); ++i)
+    {
+        // this is dumb, but will generate the same random numbers
+        // independent of parallelism and it is good enough for bootstrapping
+        std::mt19937 rng(seed+i);
+
+        const auto &file = o.data_path_vector[i];
+        LOG(LOG_DEBUG) << "read: " << file;
+
+        if(!o.step)
+        {
+            // igzstream can also read plain files
+            igzstream is(file.c_str());
+            double tau = tauFromStream(is, o.column, o.skip);
+            o.step = std::ceil(2*tau);
+        }
+
+        // I can not reset the igzstream somehow
+        igzstream is(file.c_str());
+        LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << o.step;
+        std::vector<double> numbers = vectorFromStream(is, o.column, o.skip, o.step);
+        size_t num_numbers = numbers.size();
+        std::uniform_int_distribution<int> uniform(0, num_numbers-1);
+
+        for(int j=0; j<n_sample; ++j)
+        {
+            Histogram h(o.num_bins, o.lowerBound, o.upperBound);
+            for(size_t k=0; k<num_numbers; ++k)
+            {
+                h.add(numbers[uniform(rng)]);
+            }
+            histograms[j][i] = h;
+        }
+    }
+
+    std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t3 - t2);
+    LOG(LOG_TIMING) << "reading files and bootstrapping histograms " << time_span.count() << "s";
 
     return histograms;
 }
@@ -165,24 +216,30 @@ int main(int argc, char** argv)
 
     updateBorders(o);
 
-    std::vector<Histogram> histograms = createHistograms(o);
-
-    std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
-
-    if(o.data_path_vector.size() > 1)
+    if(!o.bootstrap)
     {
+        std::vector<Histogram> histograms = createHistograms(o);
+
+        std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+
         Histogram h = glueHistograms(histograms, o.thetas, 100);
         write_out(o.output, h.ascii_table());
+
+        std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
+        LOG(LOG_TIMING) << "glueing histograms " << time_span.count() << "s";
     }
     else
     {
-        for(auto &h : histograms)
-        {
-            write_out(o.output, h.ascii_table());
-        }
-    }
+        std::vector<std::vector<Histogram>> histogramSamples = bootstrapHistograms(o, 100);
 
-    std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
-    LOG(LOG_TIMING) << "glueing histograms " << time_span.count() << "s";
+        std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
+
+        std::string table = bootstrapGlueing(histogramSamples, o.thetas, 100);
+        write_out(o.output, table);
+
+        std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
+        LOG(LOG_TIMING) << "glueing histograms " << time_span.count() << "s";
+    }
 }

@@ -68,6 +68,39 @@ Histogram histogramFromStream(T &instream, int num_bins, double lower, double up
     return h;
 }
 
+/** Vector from an input stream (of string).
+ *
+ *  \tparam T           type of the input stram
+ *  \param instream     reference to the input stream to read from
+ *  \param num_bins     how many bins should the histogram have
+ *  \param lower        lower border of the histogram
+ *  \param upper        upper border of the histogram
+ *  \param column       in which column of the input stream is the data
+ *  \param skip         skip the first lines of the input stream
+ */
+template<class T>
+std::vector<double> vectorFromStream(T &instream, int column=0, int skip=0, int step=1)
+{
+    std::vector<double> v;
+
+    int ctr = 0;
+    while(instream.good())
+    {
+        std::string line = getNextLine(instream);
+        if(line.empty() || line[0] == '#')
+            continue;
+        if(ctr++ < skip)
+            continue;
+        if((ctr-skip) % step)
+            continue;
+        std::string word = getNthWord(line, column);
+
+        double number = std::stod(word);
+        v.push_back(number);
+    }
+    return v;
+}
+
 /** Obtain the largest and smallest values from an input stream (of string).
  *
  *  \tparam         T            type of the input stram

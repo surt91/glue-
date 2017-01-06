@@ -41,6 +41,7 @@ class Cmd
         int num_bins;
 
         bool force;
+        bool bootstrap;
 
         int parallel;
 };
