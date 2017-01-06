@@ -62,7 +62,7 @@ double autocorrelationTime(const std::vector<double> &timeseries)
         tau += numbers[i].r/numbers[0].r;
     }
 
-    delete numbers;
+    delete[] numbers;
 
     return tau;
 }
