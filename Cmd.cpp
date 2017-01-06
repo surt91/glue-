@@ -73,8 +73,9 @@ Cmd::Cmd(int argc, char** argv)
         force = forceSwitch.getValue();
         LOG(LOG_INFO) << "force reread               " << force;
         parallel = parallelArg.getValue();
-        LOG(LOG_INFO) << "use parallel threads:      " << parallel;
-        omp_set_num_threads(parallel);
+        if(parallel)
+            omp_set_num_threads(parallel);
+        LOG(LOG_INFO) << "use parallel threads:      " << omp_get_num_threads();
 
         upperBound = upperArg.getValue();
         lowerBound = lowerArg.getValue();
