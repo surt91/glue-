@@ -44,7 +44,7 @@ Cmd::Cmd(int argc, char** argv)
 
         // switch argument
         // -short, --long, description, default
-        TCLAP::SwitchArg bootstrapSwitch("b", "bootstrap", "perform bootstrapping to estimate errors of the bins", cmd, false);
+        TCLAP::SwitchArg bootstrapSwitch("", "bootstrap", "perform bootstrapping to estimate errors of the bins", cmd, false);
         TCLAP::SwitchArg forceSwitch("f", "force", "forces the reevaluation of the raw data", cmd, false);
         TCLAP::SwitchArg quietSwitch("q", "quiet", "quiet mode, log only to file (if specified) and not to stdout", cmd, false);
 
