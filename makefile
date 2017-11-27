@@ -75,8 +75,11 @@ obj/%.o: %.cpp | obj
 	@mkdir -p $(@D)
 	$(CXX) -c $(WARNLEVEL) $(CXXFLAGS) $< -o $@
 
-$(TARGET): $(OBJ)
+$(TARGET): $(OBJ) kissfft/libkissfft.a
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ) $(LFLAGS)
+
+kissfft/libkissfft.a:
+	$(MAKE) -C kissfft
 
 doc/mathjax.zip:
 	mkdir -p doc/html/
