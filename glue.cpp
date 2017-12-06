@@ -97,9 +97,14 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
         }
         double meanZ;
         if(Z.size())
+        {
             meanZ = weighted_mean(Z, weight);
+        }
         else
+        {
             meanZ = 0;
+            LOG(LOG_WARNING) << "no overlap between T = " << thetas[i-1] << " and T = " << thetas[i];
+        }
 
         Zs[i] = Zs[i-1] + meanZ;
     }
