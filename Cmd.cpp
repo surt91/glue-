@@ -40,6 +40,7 @@ Cmd::Cmd(int argc, char** argv)
         TCLAP::ValueArg<int> columnArg("c", "column", "in which column is the data", false, 0, "int", cmd);
         TCLAP::ValueArg<int> skipArg("s", "skip", "how many lines to skip", false, 0, "int", cmd);
         TCLAP::ValueArg<int> stepArg("S", "step", "read only every nth line", false, 0, "int", cmd);
+        TCLAP::ValueArg<int> thresholdArg("t", "threshold", "number of entries in bin to use for glueing", false, 100, "int", cmd);
         TCLAP::ValueArg<int> parallelArg("p", "parallel", "how many omp threads to use", false, 0, "int", cmd);
 
         // switch argument
@@ -94,6 +95,8 @@ Cmd::Cmd(int argc, char** argv)
         LOG(LOG_INFO) << "skip                       " << skip;
         step = stepArg.getValue();
         LOG(LOG_INFO) << "step                       " << step;
+        threshold = stepArg.getValue();
+        LOG(LOG_INFO) << "threshold                  " << threshold;
 
         data_path_vector = dataPathArg.getValue();
         thetas = thetaArg.getValue();

@@ -222,7 +222,7 @@ int main(int argc, char** argv)
 
         std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 
-        Histogram h = glueHistograms(histograms, o.thetas, 100);
+        Histogram h = glueHistograms(histograms, o.thetas, o.threshold);
         write_out(o.output, h.ascii_table());
 
         std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
@@ -231,11 +231,11 @@ int main(int argc, char** argv)
     }
     else
     {
-        std::vector<std::vector<Histogram>> histogramSamples = bootstrapHistograms(o, 100);
+        std::vector<std::vector<Histogram>> histogramSamples = bootstrapHistograms(o, o.threshold);
 
         std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 
-        std::string table = bootstrapGlueing(histogramSamples, o.thetas, 100);
+        std::string table = bootstrapGlueing(histogramSamples, o.thetas, o.threshold);
         write_out(o.output, table);
 
         std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();

@@ -39,6 +39,7 @@ class Cmd
 
         double lowerBound, upperBound;
         int num_bins;
+        int threshold;
 
         bool force;
         bool bootstrap;
