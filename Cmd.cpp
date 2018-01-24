@@ -95,7 +95,7 @@ Cmd::Cmd(int argc, char** argv)
         LOG(LOG_INFO) << "skip                       " << skip;
         step = stepArg.getValue();
         LOG(LOG_INFO) << "step                       " << step;
-        threshold = stepArg.getValue();
+        threshold = thresholdArg.getValue();
         LOG(LOG_INFO) << "threshold                  " << threshold;
 
         data_path_vector = dataPathArg.getValue();
