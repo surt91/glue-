@@ -109,12 +109,18 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
         Zs[i] = Zs[i-1] + meanZ;
     }
     // correct data
+    // can be plotted in gnuplot with
+    // p "glued.dat" u 1:2:-1 w p palette
     for(size_t i=1; i<hists.size(); ++i)
+    {
         for(size_t j=0; j<corrected_data[i].size(); ++j)
         {
             corrected_data[i][j] += Zs[i];
-            osGlued << centers[j] << " " << corrected_data[i][j] << "\n";
+            if(std::isfinite(corrected_data[i][j]))
+                osGlued << centers[j] << " " << corrected_data[i][j] << "\n";
         }
+        osGlued << "\n";
+    }
 
     std::vector<double> unnormalized_data;
     if(hists.size() > 1)
