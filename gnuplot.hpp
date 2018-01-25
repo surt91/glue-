@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Cmd.hpp"
+#include "fileOp.hpp"
 
 
 struct GnuplotData {

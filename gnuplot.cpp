@@ -1,13 +1,5 @@
 #include "gnuplot.hpp"
 
-// https://stackoverflow.com/a/2072890/1698412
-bool ends_with(std::string const &value, std::string const &ending)
-{
-    if(ending.size() > value.size())
-        return false;
-    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
-}
-
 /** Write a gnuplot script visualizing the output for quality assesment.
  *
  *  \param gp   struct containing all relevant filenames
@@ -26,7 +18,7 @@ void write_gnuplot_quality(const GnuplotData &gp)
     os << "p ";
     for(auto &s : gp.raw_names)
     {
-        if(ends_with(s, ".gz"))
+        if(has_suffix(s, ".gz"))
             os << "'< zcat " << s << "' every 100 w l, ";
         else
             os << "'" << s << "' every 100 w l, ";
