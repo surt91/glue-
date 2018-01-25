@@ -10,6 +10,7 @@
 #include "fileOp.hpp"
 #include "glue.hpp"
 #include "autocorrelation.hpp"
+#include "gnuplot.hpp"
 
 /**
  * \mainpage glue++
@@ -215,6 +216,7 @@ int main(int argc, char** argv)
     Cmd o(argc, argv);
 
     updateBorders(o);
+    GnuplotData gp(o);
 
     if(!o.bootstrap)
     {
@@ -222,7 +224,7 @@ int main(int argc, char** argv)
 
         std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
 
-        Histogram h = glueHistograms(histograms, o.thetas, o.threshold);
+        Histogram h = glueHistograms(histograms, o.thetas, o.threshold, gp);
         write_out(o.output, h.ascii_table());
 
         std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
@@ -242,4 +244,6 @@ int main(int argc, char** argv)
         std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t4 - t3);
         LOG(LOG_TIMING) << "glueing histograms " << time_span.count() << "s";
     }
+
+    write_gnuplot_quality(gp);
 }

@@ -24,16 +24,16 @@ double correct_bias(double s, double theta, double p_theta)
  *  \param thetas       temperatures for each histogram such that hists[i] is sampled at thetas[i]
  *  \param threshold    how many entries should a bin have to be considered for determination of \f$ Z_\Theta \f$
  */
-Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<double> thetas, int threshold)
+Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<double> thetas, int threshold, const GnuplotData gp)
 {
-    std::string histname = "hist.dat";
-    std::string correctedname = "corrected.dat";
-    std::string gluedname = "glued.dat";
+    std::string histname = gp.hist_name;
+    std::string correctedname = gp.corrected_name;
+    std::string gluedname = gp.glued_name;
     std::ofstream osHist(histname);
     std::ofstream osCorrected(correctedname);
     std::ofstream osGlued(gluedname);
     for(auto &h : hists)
-        osHist << h.ascii_table();
+        osHist << h.ascii_table() << "\n";
 
     // centers of all histograms should be equal
     const auto &centers = hists[0].centers();
@@ -54,7 +54,9 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
             corrected_data.push_back(corrected);
 
             for(size_t j=0; j<data.size(); ++j)
-                osCorrected << centers[j] << " " << corrected[j] << "\n";
+                if(std::isfinite(corrected[j]))
+                    osCorrected << centers[j] << " " << corrected[j] << "\n";
+            osCorrected << "\n";
         }
     }
     else
@@ -70,7 +72,9 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
             corrected_data.push_back(corrected);
 
             for(size_t j=0; j<data.size(); ++j)
-                osCorrected << centers[j] << " " << corrected[j] << "\n";
+                if(std::isfinite(corrected[j]))
+                    osCorrected << centers[j] << " " << corrected[j] << "\n";
+            osCorrected << "\n";
         }
     }
 
