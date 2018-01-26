@@ -23,19 +23,21 @@ void write_gnuplot_quality(const GnuplotData &gp)
         else
             os << "'" << s << "' every 100 w l, ";
     }
-    os << "\n";
+    os << "\n\n";
 
     // raw histogram plot
     os << "set title 'raw logarithmic histograms'\n";
+    os << "set log y\n";
     os << "p '" << gp.hist_name << "' u 1:2:-1 w l palette\n";
+    os << "unset log\n\n";
 
     // corrected histogram plot
     os << "set title 'raw corrected histograms'\n";
-    os << "p '" << gp.corrected_name << "' u 1:2:-1 w p palette\n";
+    os << "p '" << gp.corrected_name << "' u 1:2:-1 w p palette\n\n";
 
     // glued histogram plot
     os << "set title 'unnormalized glued data'\n";
-    os << "p '" << gp.glued_name << "' u 1:2:-1 w p palette\n";
+    os << "p '" << gp.glued_name << "' u 1:2:-1 w p palette\n\n";
 
     os << "unset multiplot\n";
 
