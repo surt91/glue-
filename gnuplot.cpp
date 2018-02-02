@@ -16,12 +16,14 @@ void write_gnuplot_quality(const GnuplotData &gp)
     // raw data plot
     os << "set title 'raw data'\n";
     os << "p ";
+    int idx = 0;
     for(auto &s : gp.raw_names)
     {
         if(has_suffix(s, ".gz"))
-            os << "'< zcat " << s << "' every 100 w l, ";
+            os << "'< zcat " << s << "' every 100 u 0:1:(" << idx << ") w l palette, \\\n";
         else
-            os << "'" << s << "' every 100 w l, ";
+            os << "'" << s << "' every 100 u 0:1:(" << idx << ") w l palette, \\\n";
+        ++idx;
     }
     os << "\n\n";
 
