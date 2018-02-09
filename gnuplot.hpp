@@ -13,6 +13,7 @@ struct GnuplotData {
     std::string glued_name;
     std::string gnuplot_name;
     std::vector<std::string> raw_names;
+    std::vector<double> temperatures;
 
     GnuplotData()
         : hist_name("hist.dat"),
@@ -27,7 +28,8 @@ struct GnuplotData {
           corrected_name("corrected.dat"),
           glued_name("glued.dat"),
           gnuplot_name(o.output + ".gp"),
-          raw_names(o.data_path_vector)
+          raw_names(o.data_path_vector),
+          temperatures(o.thetas)
     {
     }
 };

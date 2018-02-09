@@ -11,7 +11,18 @@ void write_gnuplot_quality(const GnuplotData &gp)
     os << "set terminal pngcairo size 1920,1080\n";
     os << "set multiplot layout 2, 2\n";
     os << "unset key\n";
-    os << "set palette defined ( 0 'green', 1 'blue', 2 'red', 3 'orange' )\n\n";
+    os << "set palette defined ( 0 'green', 1 'blue', 2 'red', 3 'orange' )\n";
+
+    os << "set cbtics (";
+    for(size_t i=0; i<gp.temperatures.size(); ++i)
+    {
+        double T = gp.temperatures[i];
+        if(T>1000)
+            os << "\"∞\" " << i << ", ";
+        else
+            os << "\"" << T << "\" " << i << ", ";
+    }
+    os << ")\n\n";
 
     // raw data plot
     os << "set title 'raw data'\n";
