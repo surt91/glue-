@@ -29,9 +29,11 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
     std::string histname = gp.hist_name;
     std::string correctedname = gp.corrected_name;
     std::string gluedname = gp.glued_name;
+    std::string finishedname = gp.finished_name;
     std::ofstream osHist(histname);
     std::ofstream osCorrected(correctedname);
     std::ofstream osGlued(gluedname);
+    std::ofstream osFinished(finishedname);
     for(auto &h : hists)
         osHist << h.ascii_table() << "\n";
 
@@ -184,6 +186,8 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
     Histogram out(hists[0].borders());
     for(size_t i=0; i<unnormalized_data.size(); ++i)
         out.at(i) = unnormalized_data[i] - logArea;
+
+    osFinished << out.ascii_table();
 
     return out;
 }

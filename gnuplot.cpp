@@ -9,7 +9,7 @@ void write_gnuplot_quality(const GnuplotData &gp)
     std::ofstream os(gp.gnuplot_name);
     os << "set output '" << (gp.gnuplot_name + ".png") << "'\n";
     os << "set terminal pngcairo size 1920,1080\n";
-    os << "set multiplot layout 2, 2\n";
+    os << "set multiplot layout 3, 2\n";
     os << "unset key\n";
     os << "set palette defined ( 0 'green', 1 'blue', 2 'red', 3 'orange' )\n";
 
@@ -51,6 +51,10 @@ void write_gnuplot_quality(const GnuplotData &gp)
     // glued histogram plot
     os << "set title 'unnormalized glued data'\n";
     os << "p '" << gp.glued_name << "' u 1:2:-1 w p palette\n\n";
+
+    // glued histogram plot
+    os << "set title 'normalized data'\n";
+    os << "p '" << gp.finished_name << "' u 1:2\n\n";
 
     os << "unset multiplot\n";
 
