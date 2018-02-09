@@ -8,7 +8,7 @@ void write_gnuplot_quality(const GnuplotData &gp)
 {
     std::ofstream os(gp.gnuplot_name);
     os << "set output '" << (gp.gnuplot_name + ".png") << "'\n";
-    os << "set terminal pngcairo size 1920,1080\n";
+    os << "set terminal pngcairo size 1920,1440\n";
     os << "set multiplot layout 3, 2\n";
     os << "unset key\n";
     os << "set palette defined ( 0 'green', 1 'blue', 2 'red', 3 'orange' )\n";
@@ -39,9 +39,13 @@ void write_gnuplot_quality(const GnuplotData &gp)
     os << "\n\n";
 
     // raw histogram plot
+    os << "set title 'raw histograms'\n";
+    os << "p '" << gp.hist_name << "' u 1:2:-1 w p palette\n\n";
+
+    // raw histogram plot
     os << "set title 'raw logarithmic histograms'\n";
     os << "set log y\n";
-    os << "p '" << gp.hist_name << "' u 1:2:-1 w l palette\n";
+    os << "p '" << gp.hist_name << "' u 1:2:-1 w p palette\n";
     os << "unset log\n\n";
 
     // corrected histogram plot
