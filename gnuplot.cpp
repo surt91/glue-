@@ -26,6 +26,8 @@ void write_gnuplot_quality(const GnuplotData &gp)
 
     // raw data plot
     os << "set title 'raw data'\n";
+    os << "set xl 't'\n";
+    os << "set yl 's'\n";
     os << "p ";
     int idx = 0;
     for(auto &s : gp.raw_names)
@@ -40,25 +42,37 @@ void write_gnuplot_quality(const GnuplotData &gp)
 
     // raw histogram plot
     os << "set title 'raw histograms'\n";
+    os << "set xl 's'\n";
+    os << "set yl '#'\n";
     os << "p '" << gp.hist_name << "' u 1:2:-1 w p palette\n\n";
 
     // raw histogram plot
     os << "set title 'raw logarithmic histograms'\n";
+    os << "set xl 's'\n";
+    os << "set yl 'P_T(s)'\n";
     os << "set log y\n";
     os << "p '" << gp.hist_name << "' u 1:2:-1 w p palette\n";
     os << "unset log\n\n";
 
+    os << "set format y '10^{%.0f}'\n";
+
     // corrected histogram plot
     os << "set title 'raw corrected histograms'\n";
-    os << "p '" << gp.corrected_name << "' u 1:2:-1 w p palette\n\n";
+    os << "set xl 's'\n";
+    os << "set yl 'e^{s/T} P_T(s)'\n";
+    os << "p '" << gp.corrected_name << "' u 1:($2/log(10)):-1 w p palette\n\n";
 
     // glued histogram plot
     os << "set title 'unnormalized glued data'\n";
-    os << "p '" << gp.glued_name << "' u 1:2:-1 w p palette\n\n";
+    os << "set xl 's'\n";
+    os << "set yl 'a e^{s/T} Z(T) P_T(s)'\n";
+    os << "p '" << gp.glued_name << "' u 1:($2/log(10)):-1 w p palette\n\n";
 
     // glued histogram plot
     os << "set title 'normalized data'\n";
-    os << "p '" << gp.finished_name << "' u 1:2\n\n";
+    os << "set xl 's'\n";
+    os << "set yl 'P(s)'\n";
+    os << "p '" << gp.finished_name << "' u 1:($2/log(10))\n\n";
 
     os << "unset multiplot\n";
 
