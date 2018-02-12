@@ -99,7 +99,7 @@ bool sameBorders(std::vector<Histogram> histograms)
  * calculated cached histogram, use those, otherwise generate the
  * histograms from raw data.
  */
-std::vector<Histogram> createHistograms(Cmd &o)
+std::vector<Histogram> createHistograms(const Cmd &o)
 {
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 
@@ -108,6 +108,7 @@ std::vector<Histogram> createHistograms(Cmd &o)
     #pragma omp parallel for schedule(dynamic,1)
     for(size_t i=0; i<o.data_path_vector.size(); ++i)
     {
+        int step = o.step;
         const auto &file = o.data_path_vector[i];
         LOG(LOG_DEBUG) << "read: " << file;
 
@@ -140,13 +141,13 @@ std::vector<Histogram> createHistograms(Cmd &o)
                 // igzstream can also read plain files
                 igzstream is(file.c_str());
                 double tau = tauFromStream(is, o.column, o.skip);
-                o.step = std::ceil(2*tau);
+                step = std::ceil(2*tau);
             }
 
             // I can not reset the igzstream somehow
             igzstream is(file.c_str());
-            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << o.step;
-            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, o.step);
+            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << step;
+            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, step);
 
             // save histogram to load it the next time ~ cache
             histograms[i].writeToFile(file + ".hist");
