@@ -1,7 +1,8 @@
 #include "Histogram.hpp"
 
 Histogram::Histogram()
-    : m_cur_min(0),
+    : num_bins(0),
+      m_cur_min(0),
       m_total(0),
       m_sum(0),
       above(0),
@@ -258,6 +259,7 @@ void Histogram::readFromFile(const std::string filename)
     if(!is.good())
     {
         LOG(LOG_ERROR) << "can not read " << filename;
+        exit(1);
     }
 
     // the format is pretty strict: 2 lines, in the first borders
@@ -266,13 +268,19 @@ void Histogram::readFromFile(const std::string filename)
     std::getline(is, lineBorders);
     std::getline(is, lineData);
 
+    if(lineBorders == "\n" || lineBorders == "")
+    {
+        LOG(LOG_ERROR) << "empty file " << filename;
+        exit(1);
+    }
+
     std::string item;
     std::stringstream ss;
 
     ss.str(lineBorders);
     while (std::getline(ss, item, ' '))
         bins.push_back(std::stod(item));
-    ss. clear();
+    ss.clear();
 
     ss.str(lineData);
     while (std::getline(ss, item, ' '))
