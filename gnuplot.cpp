@@ -33,9 +33,9 @@ void write_gnuplot_quality(const GnuplotData &gp)
     for(auto &s : gp.raw_names)
     {
         if(has_suffix(s, ".gz"))
-            os << "'< zcat " << s << "' every 100 u 0:1:(" << idx << ") w l palette, \\\n";
+            os << "'< zcat " << s << "' every 100 u 0:" << (gp.column + 1) << ":(" << idx << ") w l palette, \\\n";
         else
-            os << "'" << s << "' every 100 u 0:1:(" << idx << ") w l palette, \\\n";
+            os << "'" << s << "' every 100 u 0:" << (gp.column + 1) << ":(" << idx << ") w l palette, \\\n";
         ++idx;
     }
     os << "\n\n";
