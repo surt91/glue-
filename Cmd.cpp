@@ -105,7 +105,7 @@ Cmd::Cmd(int argc, char** argv)
             LOG(LOG_ERROR) << "You need at least one input file";
             exit(2);
         }
-        if(data_path_vector.size() > 1 && data_path_vector.size() != thetas.size())
+        if(data_path_vector.size() > 1 && !thetas.empty() && data_path_vector.size() != thetas.size())
         {
             LOG(LOG_ERROR) << "You need at a temperature (theta) value for each input file";
             exit(3);
@@ -113,9 +113,13 @@ Cmd::Cmd(int argc, char** argv)
         LOG(LOG_INFO) << "Paths to read the data from: {";
         for(size_t j=0; j<data_path_vector.size(); ++j)
         {
-            if(data_path_vector.size() > 1)
+            if(data_path_vector.size() > 1 && thetas.size() > 1)
             {
                 LOG(LOG_INFO) << "  " << thetas[j] << ": " << data_path_vector[j] << ",";
+            }
+            else if(data_path_vector.size() > 1)
+            {
+                LOG(LOG_INFO) << "  " << data_path_vector[j] << ",";
             }
             else
             {

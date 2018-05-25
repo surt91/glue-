@@ -106,10 +106,16 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
         {
             meanZ = weighted_mean(Z, weight);
         }
-        else
+        else if(!thetas.empty())
         {
             meanZ = 0;
             LOG(LOG_WARNING) << "no overlap between T = " << thetas[i-1] << " and T = " << thetas[i];
+        }
+        else
+        {
+            meanZ = 0;
+            LOG(LOG_WARNING) << "no overlap between [" << (i-1)
+                <<  "] and [" << i <<  "]";
         }
 
         Zs[i] = Zs[i-1] + meanZ;
