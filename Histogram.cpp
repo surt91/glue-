@@ -264,14 +264,26 @@ void Histogram::readFromFile(const std::string filename)
 
     // the format is pretty strict: 2 lines, in the first borders
     // separated by space, in the second counts separated by whitespace
+    // empty lines and lines starting with '#' are ignored
     std::string lineBorders, lineData;
-    std::getline(is, lineBorders);
-    std::getline(is, lineData);
 
-    if(lineBorders == "\n" || lineBorders == "")
+    while(lineBorders[0] == '\n' || lineBorders[0] == '#')
     {
-        LOG(LOG_ERROR) << "empty file " << filename;
-        exit(1);
+        std::getline(is, lineBorders);
+        if(!is.good())
+        {
+            LOG(LOG_ERROR) << "empty file " << filename;
+            exit(1);
+        }
+    }
+    while(lineBorders[0] == '\n' || lineBorders[0] == '#')
+    {
+        std::getline(is, lineData);
+        if(!is.good())
+        {
+            LOG(LOG_ERROR) << "only borders, no data in file " << filename;
+            exit(1);
+        }
     }
 
     std::string item;
