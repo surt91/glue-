@@ -66,7 +66,7 @@ bool isHistogramFile(std::string filename)
     int ctr = 0;
     while(std::getline(is, item) && ctr < 5)
     {
-        if(item[0] != '#' && item[0] != '\n')
+        if(item.size() > 0 && item[0] != '#')
             ++ctr;
     }
 

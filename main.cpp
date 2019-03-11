@@ -118,39 +118,60 @@ std::vector<Histogram> createHistograms(const Cmd &o)
         // else evaluate the datafile
 
         Histogram tmp_hist;
-        if(isHistogramFile(file) && !o.force)
-            tmp_hist = Histogram(file);
-        else if(fileReadable(file+".hist") && !o.force)
-            tmp_hist = Histogram(file+".hist");
-
-        if(!o.force
-        && tmp_hist.get_num_bins() == o.num_bins
-        && std::abs(o.lowerBound - tmp_hist.borders().front()) < 1e-1
-        && std::abs(o.upperBound - tmp_hist.borders().back()) < 1e-1
-        )
+        // if we give an explicit histogram, use it
+        if(isHistogramFile(file))
         {
-            histograms[i] = std::move(tmp_hist);
-            LOG(LOG_DEBUG) << "load histogram for " << file;
+            tmp_hist = Histogram(file);
+            histograms[i] = Histogram(o.num_bins, o.lowerBound, o.upperBound);
+            auto centers = tmp_hist.centers();
+            auto data = tmp_hist.get_data();
+
+            for(int j=0; j<tmp_hist.get_num_bins(); ++j)
+            {
+                LOG(LOG_INFO) << centers[j] << ", " << data[j];
+                histograms[i].add(centers[j], data[j]);
+            }
+
+            LOG(LOG_INFO) << histograms[i].ascii_table();
+
+            LOG(LOG_DEBUG) << "load histogram from " << file;
         }
         else
         {
-            LOG(LOG_DEBUG) << "calculate histogram for " << file;
+            // else see, if we have a temporary histogram cached
+            if(fileReadable(file+".hist") && !o.force)
+                tmp_hist = Histogram(file+".hist");
 
-            if(!o.step)
+            // if it does not fit, calculate new
+            if(!o.force
+            && tmp_hist.get_num_bins() == o.num_bins
+            && std::abs(o.lowerBound - tmp_hist.borders().front()) < 1e-1
+            && std::abs(o.upperBound - tmp_hist.borders().back()) < 1e-1
+            )
             {
-                // igzstream can also read plain files
-                igzstream is(file.c_str());
-                double tau = tauFromStream(is, o.column, o.skip);
-                step = std::ceil(2*tau);
+                histograms[i] = std::move(tmp_hist);
+                LOG(LOG_DEBUG) << "load histogram for " << file;
             }
+            else
+            {
+                LOG(LOG_DEBUG) << "calculate histogram for " << file;
 
-            // I can not reset the igzstream somehow
-            igzstream is(file.c_str());
-            LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << step;
-            histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, step);
+                if(!o.step)
+                {
+                    // igzstream can also read plain files
+                    igzstream is(file.c_str());
+                    double tau = tauFromStream(is, o.column, o.skip);
+                    step = std::ceil(2*tau);
+                }
 
-            // save histogram to load it the next time ~ cache
-            histograms[i].writeToFile(file + ".hist");
+                // I can not reset the igzstream somehow
+                igzstream is(file.c_str());
+                LOG(LOG_DEBUG) << file << ": t_eq = " << o.skip << ", tau = " << step;
+                histograms[i] = histogramFromStream(is, o.num_bins, o.lowerBound, o.upperBound, o.column, o.skip, step);
+
+                // save histogram to load it the next time ~ cache
+                histograms[i].writeToFile(file + ".hist");
+            }
         }
     }
 

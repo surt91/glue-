@@ -267,7 +267,7 @@ void Histogram::readFromFile(const std::string filename)
     // empty lines and lines starting with '#' are ignored
     std::string lineBorders, lineData;
 
-    while(lineBorders[0] == '\n' || lineBorders[0] == '#')
+    do
     {
         std::getline(is, lineBorders);
         if(!is.good())
@@ -275,16 +275,17 @@ void Histogram::readFromFile(const std::string filename)
             LOG(LOG_ERROR) << "empty file " << filename;
             exit(1);
         }
-    }
-    while(lineBorders[0] == '\n' || lineBorders[0] == '#')
+    } while(lineBorders.size() == 0 || lineBorders[0] == '#');
+
+    do
     {
         std::getline(is, lineData);
-        if(!is.good())
+        if(!is.good() || lineBorders == "")
         {
             LOG(LOG_ERROR) << "only borders, no data in file " << filename;
             exit(1);
         }
-    }
+    } while(lineBorders.size() == 0 || lineBorders[0] == '#');
 
     std::string item;
     std::stringstream ss;

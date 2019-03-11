@@ -41,7 +41,7 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
     const auto &centers = hists[0].centers();
 
     std::vector<std::vector<double>> corrected_data;
-    // if no temperatures are given, do just take the logarithm
+    // if no temperatures are given, do just merge the histograms
     if(!thetas.empty())
     {
         for(size_t i=0; i<hists.size(); ++i)
@@ -69,13 +69,13 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
 
             std::vector<double> corrected;
             for(size_t j=0; j<data.size(); ++j)
-                corrected.push_back(std::log(data[j]));
+                corrected.push_back(data[j]);
 
             corrected_data.push_back(corrected);
 
             for(size_t j=0; j<data.size(); ++j)
                 if(std::isfinite(corrected[j]))
-                    osCorrected << centers[j] << " " << corrected[j] << "\n";
+                    osCorrected << centers[j] << " " << data[j] << "\n";
             osCorrected << "\n";
         }
     }
@@ -98,7 +98,14 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
             {
                 Z.push_back(data1[j]-data2[j]);
                 // weight the Z: more weight, if both datasets have many entries
-                weight.push_back(std::min(hists[i].get_data()[j], hists[i].get_data()[j]));
+                if(!thetas.empty())
+                {
+                    weight.push_back(std::min(hists[i].get_data()[j], hists[i].get_data()[j]));
+                }
+                else // equal weight, if data originates from WL
+                {
+                    weight.push_back(1);
+                }
             }
         }
         double meanZ;
