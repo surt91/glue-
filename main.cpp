@@ -128,11 +128,8 @@ std::vector<Histogram> createHistograms(const Cmd &o)
 
             for(int j=0; j<tmp_hist.get_num_bins(); ++j)
             {
-                LOG(LOG_INFO) << centers[j] << ", " << data[j];
                 histograms[i].add(centers[j], data[j]);
             }
-
-            LOG(LOG_INFO) << histograms[i].ascii_table();
 
             LOG(LOG_DEBUG) << "load histogram from " << file;
         }
