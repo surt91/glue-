@@ -1,6 +1,6 @@
 #include "gnuplot.hpp"
 
-/** Write a gnuplot script visualizing the output for quality assesment.
+/** Write a gnuplot script visualizing the output for quality assessment.
  *
  *  \param gp   struct containing all relevant filenames
  */
