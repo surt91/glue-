@@ -119,6 +119,7 @@ Cmd::Cmd(int argc, char** argv)
             }
             else if(data_path_vector.size() > 1)
             {
+                LOG(LOG_INFO) "No thetas given, assume Wang Landau evaluation";
                 LOG(LOG_INFO) << "  " << data_path_vector[j] << ",";
             }
             else

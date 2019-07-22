@@ -68,8 +68,15 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
             const auto &data = hists[i].get_data();
 
             std::vector<double> corrected;
+            // if we get histograms, we assume that they originate from WL
+            // we will replace zeros by nan for nicer plots
+            // if we want to evaluate simple sampling, we need to pass
+            // infinite theta
             for(size_t j=0; j<data.size(); ++j)
-                corrected.push_back(data[j]);
+                if(data[j] <= 0)
+                    corrected.push_back(std::nan(""));
+                else
+                    corrected.push_back(data[j]);
 
             corrected_data.push_back(corrected);
 
