@@ -178,16 +178,18 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
     std::vector<double> expData;
     std::vector<double> expCenters;
     // find largest element and normalize all to avoid numerical problems
-    double m = 0;
+    double m = -1e300;
     for(auto i : unnormalized_data)
         if(i>m)
             m = i;
+
+    LOG(LOG_DEBUG) << "max: " << m;
 
     for(size_t i=0; i<unnormalized_data.size(); ++i)
     {
         // avoid nan, would result in a nan area
         // this should also work with -ffast-math
-        if(unnormalized_data[i] > 1e-300 && unnormalized_data[i] < 1e300)
+        if(unnormalized_data[i] > -1e300 && unnormalized_data[i] < 1e300)
         {
             expData.push_back(std::exp(unnormalized_data[i]-m));
             expCenters.push_back(hists[0].centers()[i]);
