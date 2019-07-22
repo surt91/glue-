@@ -16,6 +16,14 @@ double correct_bias(double s, double theta, double p_theta)
     return s/theta + std::log(p_theta);
 }
 
+void write_to_stream(std::ofstream &oss, const std::vector<double> &centers, const std::vector<double> &data)
+{
+    for(size_t j=0; j<data.size(); ++j)
+        if(std::isfinite(data[j]))
+            oss << centers[j] << " " << data[j] << "\n";
+    oss << "\n";
+}
+
 /** Determine the normalization constants \f$ Z_\Theta \f$.
  *
  *  The histograms need to have the same borders.
@@ -53,12 +61,9 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
             for(size_t j=0; j<data.size(); ++j)
                 corrected.push_back(correct_bias(centers[j], theta, data[j]));
 
-            corrected_data.push_back(corrected);
+            write_to_stream(osCorrected, centers, corrected);
 
-            for(size_t j=0; j<data.size(); ++j)
-                if(std::isfinite(corrected[j]))
-                    osCorrected << centers[j] << " " << corrected[j] << "\n";
-            osCorrected << "\n";
+            corrected_data.emplace_back(std::move(corrected));
         }
     }
     else
@@ -78,12 +83,9 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
                 else
                     corrected.push_back(data[j]);
 
-            corrected_data.push_back(corrected);
+            write_to_stream(osCorrected, centers, corrected);
 
-            for(size_t j=0; j<data.size(); ++j)
-                if(std::isfinite(corrected[j]))
-                    osCorrected << centers[j] << " " << data[j] << "\n";
-            osCorrected << "\n";
+            corrected_data.emplace_back(std::move(corrected));
         }
     }
 
@@ -135,24 +137,12 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
         Zs[i] = Zs[i-1] + meanZ;
     }
 
-    // can be plotted in gnuplot with
-    // p "glued.dat" u 1:2:-1 w p palette
-    for(size_t j=0; j<corrected_data[0].size(); ++j)
-    {
-        if(std::isfinite(corrected_data[0][j]))
-            osGlued << centers[j] << " " << corrected_data[0][j] << "\n";
-    }
-    osGlued << "\n";
     for(size_t i=1; i<hists.size(); ++i)
-    {
         for(size_t j=0; j<corrected_data[i].size(); ++j)
-        {
             corrected_data[i][j] += Zs[i];
-            if(std::isfinite(corrected_data[i][j]))
-                osGlued << centers[j] << " " << corrected_data[i][j] << "\n";
-        }
-        osGlued << "\n";
-    }
+
+    for(size_t i=0; i<hists.size(); ++i)
+        write_to_stream(osGlued, centers, corrected_data[i]);
 
     std::vector<double> unnormalized_data;
     if(hists.size() > 1)
