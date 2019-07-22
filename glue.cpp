@@ -152,15 +152,27 @@ Histogram glueHistograms(const std::vector<Histogram> &hists, const std::vector<
         {
             double total = 0;
             double total_weight = 0;
-            for(size_t i=0; i<hists.size(); ++i)
+            if(!thetas.empty())
             {
-                double value = corrected_data[i][j];
-                double weight = hists[i].get_data()[j];
-                if(weight > threshold)
+                for(size_t i=0; i<hists.size(); ++i)
                 {
-                    total += value * weight;
-                    total_weight += weight;
+                    double value = corrected_data[i][j];
+                    double weight = hists[i].get_data()[j];
+                    if(weight > threshold)
+                    {
+                        total += value * weight;
+                        total_weight += weight;
+                    }
                 }
+            }
+            else // we have WL, we can not weight this
+            {
+                for(size_t i=0; i<hists.size(); ++i)
+                    if(std::isfinite(corrected_data[i][j]))
+                    {
+                        total += corrected_data[i][j];
+                        ++total_weight;
+                    }
             }
 
             unnormalized_data.push_back(total/total_weight);
