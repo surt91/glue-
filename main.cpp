@@ -39,7 +39,7 @@ void updateBorders(Cmd &o)
         LOG(LOG_INFO) << "determine borders from files (" << o.border_path_vector.size() << " given)";
 
         double lower = 1e300;
-        double upper = 1e-300;
+        double upper = -1e300;
 
         #pragma omp parallel for reduction(min:lower), reduction(max:upper)
         for(size_t i=0; i<o.border_path_vector.size(); ++i)
