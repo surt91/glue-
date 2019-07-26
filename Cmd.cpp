@@ -110,6 +110,10 @@ Cmd::Cmd(int argc, char** argv)
             LOG(LOG_ERROR) << "You need at a temperature (theta) value for each input file";
             exit(3);
         }
+        if(thetas.empty())
+        {
+            LOG(LOG_INFO) << "No thetas given, assume Wang Landau evaluation";
+        }
         LOG(LOG_INFO) << "Paths to read the data from: {";
         for(size_t j=0; j<data_path_vector.size(); ++j)
         {
@@ -119,7 +123,6 @@ Cmd::Cmd(int argc, char** argv)
             }
             else if(data_path_vector.size() > 1)
             {
-                LOG(LOG_INFO) << "No thetas given, assume Wang Landau evaluation";
                 LOG(LOG_INFO) << "  " << data_path_vector[j] << ",";
             }
             else
