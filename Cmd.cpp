@@ -133,7 +133,11 @@ Cmd::Cmd(int argc, char** argv)
             if(!is.good())
             {
                 LOG(LOG_ERROR) << "Can not read " << data_path_vector[j];
-                exit(3);
+                LOG(LOG_WARNING) << "evaluate without " << data_path_vector[j];
+                data_path_vector.erase(data_path_vector.begin()+j);
+                if(thetas.size() > 1)
+                    thetas.erase(thetas.begin()+j);
+                --j;
             }
         }
         LOG(LOG_INFO) << "}";
