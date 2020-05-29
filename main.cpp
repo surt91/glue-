@@ -126,7 +126,8 @@ std::vector<Histogram> createHistograms(const Cmd &o)
             auto centers = tmp_hist.centers();
             auto data = tmp_hist.get_data();
 
-            for(int j=0; j<tmp_hist.get_num_bins(); ++j)
+            // fill the values into our newly binned histogram, but omit the left and righ most `threshold` bins
+            for(int j=o.threshold; j<tmp_hist.get_num_bins() - o.threshold; ++j)
             {
                 histograms[i].add(centers[j], data[j]);
             }
