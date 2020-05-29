@@ -36,7 +36,7 @@ CXXFLAGS += -fopenmp
 #CXXFLAGS = -fsanitize=memory -fno-omit-frame-pointer -g -O2 -fsanitize-memory-track-origins
 #CXXFLAGS = -fsanitize=undefined -O2
 
-WARNLEVEL= -Wall -Wextra -Wpedantic -Werror -Wno-unknown-pragmas
+WARNLEVEL= -Wall -Wextra -Wpedantic -Werror -Wno-unknown-pragmas -Wno-unused-result
 #WARNLEVEL += -Wfloat-equal -Wshadow -Wextra-semi -Wdocumentation -Wdeprecated
 #WANRLEVEL += -Weverything -Wno-c++98-compat -Wno-c++98-compat-bind-to-temporary-copy -Wno-padded
 
