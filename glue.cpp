@@ -27,7 +27,7 @@ void write_to_stream(std::ofstream &oss, const std::vector<double> &centers, con
 
 /** Determine the normalization constants Z
  *
- *  These can be used to correct the biased distributions by shifting accodring to
+ *  These can be used to correct the biased distributions by shifting according to
  *  \f[ \frac{1}{Z_\Theta} P(S) = e^{S/\Theta} P_{\Theta} \f]
  *
  * \param hists input histograms, used to determine weights
@@ -41,6 +41,7 @@ std::vector<double> determineZ(const std::vector<Histogram> &hists, const std::v
     std::vector<double> Zs(hists.size(), 0);
     for(size_t i=1; i<hists.size(); ++i)
     {
+        // TODO: do not only use successive histograms for glueing, but all 
         const auto &count1 = hists[i-1].get_data();
         const auto &count2 = hists[i].get_data();
         const auto &data1 = corrected_data[i-1];
