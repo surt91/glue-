@@ -1,9 +1,9 @@
 [submodule "gzstream"]
 	path = gzstream
-	url = git@gist.github.com:b7e12efe8d50799a258e272d754e7203.git
+	url = https://gist.github.com/5e68302710ba737b50aa0b147a908025.git
 [submodule "tclap"]
 	path = tclap
-	url = git@github.com:mirror/tclap.git
+	url = https://github.com/mirror/tclap.git
 [submodule "kissfft"]
 	path = kissfft
-	url = git@github.com:surt91/kissfft.git
+	url = https://github.com/surt91/kissfft.git
