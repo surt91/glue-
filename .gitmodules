@@ -1,6 +1,6 @@
 [submodule "gzstream"]
 	path = gzstream
-	url = https://gist.github.com/5e68302710ba737b50aa0b147a908025.git
+	url = https://gist.github.com/b7e12efe8d50799a258e272d754e7203.git
 [submodule "tclap"]
 	path = tclap
 	url = https://github.com/mirror/tclap.git
